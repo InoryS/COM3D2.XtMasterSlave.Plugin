@@ -36,5 +36,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: COM3D2.XtMasterSlave.Plugin
-          path: /home/runner/work/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/bin/Release/COM3D2.XtMasterSlave.Plugin.dll
+          path: /home/runner/work/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/COM3D2.XTMasterSlave.Plugin/bin/Release/net35/COM3D2.XTMasterSlave.Plugin.dll
     
