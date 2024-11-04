@@ -10236,8 +10236,8 @@ namespace ExtensionMethods
 			// 157
 			// public void IKAttach(FullBodyIKMgr.IKEffectorType effector_type, IKAttachParam param)
 			// public void IKAttach(string ik_name, IKAttachParam param)
-			m.body0.fullBodyIK.IKAttach(ik_name, ikattachParam);
-
+			// ?
+			// m.body0.fullBodyIK.IKAttach(ik_name, ikattachParam);
 		}
 
 		static Assembly LoadIkDll(string dllname)

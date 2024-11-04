@@ -24,10 +24,12 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;COM3D2</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+
+
   <PropertyGroup>
     <RootNamespace>COM3D2.XTMasterSlave.Plugin</RootNamespace>
   </PropertyGroup>
@@ -38,6 +40,8 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\libs\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+
+
     <Reference Include="JsonFx.Json">
       <HintPath>..\libs\JsonFx.Json.dll</HintPath>
     </Reference>
@@ -61,12 +65,6 @@
   <ItemGroup>
     <Compile Include="COM3D2.XTMasterSlave.2ndWnd.cs" />
     <Compile Include="COM3D2.XTMasterSlave.Plugin.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".vs\ProjectSettings.json" />
-    <None Include=".vs\slnx.sqlite" />
-    <None Include=".vs\source\v16\.suo" />
-    <None Include=".vs\VSWorkspaceState.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
