@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild.exe path
+        run: |
+          sudo apt-get install -y apt-transport-https
+          sudo apt-get update
+          sudo apt-get install -y mono-devel
+          sudo apt-get install -y msbuild
+          echo "msbuild: $(which msbuild)"
+        
+      - name: Build
+        run: |
+          msbuild /p:Configuration=Release /p:TargetFrameworkVersion=v3.5
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: COM3D2.XtMasterSlave.Plugin
+          path: /home/runner/work/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/bin/Release/COM3D2.XtMasterSlave.Plugin.dll
+    
