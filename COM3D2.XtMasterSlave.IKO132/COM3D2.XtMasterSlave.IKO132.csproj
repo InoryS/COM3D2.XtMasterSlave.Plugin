@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-    <AssemblyName>COM3D2.XTMasterSlave.IKO132</AssemblyName>
+    <AssemblyName>COM3D2.XtMasterSlave.IKO132</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COM3D2.XTMasterSlave.Plugin", "COM3D2.XTMasterSlave.Plugin\COM3D2.XTMasterSlave.Plugin.csproj", "{72423EF5-EDCA-40C9-B4EF-ED9FE42BB59F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBD}") = "COM3D2.XTMasterSlave.IKO132", "COM3D2.XTMasterSlave.IKO132\COM3D2.XTMasterSlave.IKO132.csproj", "{72423EF5-EDCA-40C9-B4EF-ED9FE42BB59D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBD}") = "COM3D2.XTMasterSlave.IKO132", "COM3D2.XtMasterSlave.IKO132\COM3D2.XtMasterSlave.IKO132.csproj", "{72423EF5-EDCA-40C9-B4EF-ED9FE42BB59D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
