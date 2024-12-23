@@ -129,7 +129,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 
 		static bool bIsVymPlg = false;
 		//static bool bVoicePlaying = false;
-		//static bool bHitChkResized = false; 
+		//static bool bHitChkResized = false;
 
 		//回想モード
 		static bool vIsKaisouScene = false;
@@ -274,7 +274,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 								debugPrintConsole("hit: name:" + hit.collider.gameObject.name + " tag:" + hit.collider.gameObject.tag);
 								if (hit.collider.gameObject.name == this.name)
 								{
-									
+
 								}
 							}*/
 							object obj2 = _fi_beSelectedType.GetValue(this);
@@ -717,7 +717,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 			{
 				if (cfg.doIKTargetMHandSpCustom_v2)
 				{
-					return ref customHandR.pos; 
+					return ref customHandR.pos;
 				}
 				return ref v3HandROffset;
 			}
@@ -2042,7 +2042,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 			{
 				GetModifierKeys(mdfkey);
 				return m_getMdfKeys == mdfkey;
-			} 
+			}
 		}
 		#endregion
 		public static bool IsKeepScene()
@@ -2317,7 +2317,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 
 			//以下のシーンにある場合、プラグインを有効化
 			//4：ドキドキ Fallin' Love   5：エディット
-			//15：コミュニケーション等   
+			//15：コミュニケーション等
 			//20：entrance to you   22：scarlet leap
 			//26：stellar my tears   24：回想   27：撮影モード
 			if (0 <= Array.IndexOf(cfg.IgnoreSceneLevel, vSceneLevel) && !bIsYotogiScene)
@@ -2653,7 +2653,8 @@ namespace CM3D2.XtMasterSlave.Plugin
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("XtMS: 設定画面での例外エラー　状況：{0}\r\n" + e, _WinprocPhase);
+				Console.WriteLine("XtMS: 設定画面での例外エラー　状況：{0}", _WinprocPhase);
+				Console.WriteLine(e.ToString());
 			}
 
 			GUI.DragWindow(rc_stgw_caption);
@@ -2764,7 +2765,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 			public HashSet<string> holdSlvMaskItems = new HashSet<string>();
 
 			//透明度保持
-			//public float holdManAlpha = -1f; 
+			//public float holdManAlpha = -1f;
 
 			public bool CheckSlvMaskSlave(Maid m)
 			{
@@ -2960,7 +2961,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 				}
 			}*/
 			/*
-			//キャラクター増減時の後処理用 
+			//キャラクター増減時の後処理用
 			public static void AllMsUpdateListChanged()
 			{
 				GetMens();
@@ -3408,7 +3409,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 					{
 						// 手が届かない
 						elbow.transform.rotation = Quaternion.identity;
-						
+
 					}
 					else {
 						//float tgtd = Mathf.Sqrt( tgtd2 );
@@ -3588,7 +3589,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 				bool needTwist = false;
 				//bkupHandRotR = false;
 				//bkupHandRotL = false;
-				
+
 				var p_mscfg = cfgs[num_];
 				var p_v3of = v3ofs[num_];
 				var p_v3of2 = new v3OffsetsV2(v3ofs[num_], p_mscfg);
@@ -3601,7 +3602,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 				{
 					if (master && p_mscfg.doIKTargetMHand) // v5.0
 					{
-						if (!p_mscfg.doIK159NewPointToDef && p_mscfg.doIK159RotateToHands) 
+						if (!p_mscfg.doIK159NewPointToDef && p_mscfg.doIK159RotateToHands)
 						{
 							// v5.0 SetHandIKRotate同様のグローバル角度での調整
 							Transform trh0 = BoneLink.BoneLink.SearchObjName(master.body0.m_Bones.transform, GetHandBnR(master), true);
@@ -3712,7 +3713,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 										}
 										/*else
 										{
-											//モーションチェック                                            
+											//モーションチェック
 											bool motion_stop = true;
 											Animation animation = slave.body0.m_Bones.GetComponent<Animation>();
 											if (animation != null)
@@ -4215,7 +4216,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 					boneLink.Try(master, slave, doMasterSlave,
 						(cfg_.doStackSlave && cfg_.doStackSlave_Pelvis),    //骨盤補正
 						(cfg_.doStackSlave && cfg_.doStackSlave_CliCnk),    //局部補正
-						Quaternion.Euler(0, -90, -90) * v3ofs[num_].v3StackOffset,      //補正座標 
+						Quaternion.Euler(0, -90, -90) * v3ofs[num_].v3StackOffset,      //補正座標
 						v3ofs[num_], cfg_);                         //手のアタッチ調整用
 					//v3ofs[num_].v3StackOffset2Bip(slave, cfg_.doStackSlave && (cfg_.doStackSlave_Pelvis || cfg_.doStackSlave_CliCnk)));                         //補正座標
 				}
@@ -6430,7 +6431,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 
 						}
 
-						bool guibk_01 = GUI.enabled; 
+						bool guibk_01 = GUI.enabled;
 						if (ms_.mdSlave_No == 0 && !bIsYotogiScene) //v5.0
 							GUI.enabled = false;
 						p_mscfg.doFaceSync = GUI.Toggle(rcItem, p_mscfg.doFaceSync, "Slaveの表情をMaid0から複製", gsToggle);
@@ -8759,7 +8760,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 					trh.rotation = trh0.rotation * Quaternion.Euler(v3HandROffsetRot);
 
 				}
-				else 
+				else
 				if (IkXT.IsNewIK && mscfg.doIK159RotateToHands/*Ik159.IsNewPointIK(slave, "右手")*/) // 手首角度のアタッチ v0027
 				{
 					//slave.IKTargetToBone("右手", master, bone_handR, v3HandROffsetRot, IKMgrData.IKAttachType.Rotate, false);
@@ -9053,7 +9054,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 
 			var vc = trs.position;
 			var rot = trs.rotation;
-			
+
 			Transform[] t_bones = bodytmph.GetType().InvokeMember("m_bones", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.NonPublic, null, bodytmph, null) as Transform[];
 			if (t_bones == null)
 				return false;
@@ -10236,7 +10237,7 @@ namespace ExtensionMethods
 			// 157
 			// public void IKAttach(FullBodyIKMgr.IKEffectorType effector_type, IKAttachParam param)
 			// public void IKAttach(string ik_name, IKAttachParam param)
-			// ?
+			//?
 			// m.body0.fullBodyIK.IKAttach(ik_name, ikattachParam);
 		}
 
@@ -10300,31 +10301,78 @@ namespace ExtensionMethods
 
 			// cm3d2 1.59~
 			public static Type _typIKM159 = Assembly.Load("Assembly-CSharp").GetType("IKMgrData");
-			public static bool IsIkMgr159 { get { return _typIKM159 != null; } }
+			public static bool IsIkMgr159
+			{
+				get
+				{
+#if DEBUG
+					Console.WriteLine($"[XTMS]  Checking for IKMgrData existence(_typIKM159): {_typIKM159 != null}");
+#endif
+					return _typIKM159 != null;
+				}
+			}
 
 			// com3d2 1.17~
 			public static Type _typIKO117 = Assembly.Load("Assembly-CSharp").GetType("IKCtrlData");
-			public static bool IsIkCtrlO117 { get { return _typIKO117 != null; } }
+			public static bool IsIkCtrlO117
+			{
+				get
+				{
+#if DEBUG
+					Console.WriteLine($"[XTMS]  Checking for IKCtrlData existence(_typIKO117): {_typIKO117 != null}");
+#endif
+					return _typIKO117 != null;
+				}
+			}
 
 			// com3d2 1.18~
 			public static Type _typFLIK = Assembly.Load("Assembly-CSharp").GetType("FullBodyIKCtrl");
-			//public static MethodInfo _methIKG118 = Assembly.Load("Assembly-CSharp").GetType("FullBodyIKCtrl")
-			//                                            .GetMethod("GetIKData", BindingFlags.Instance | BindingFlags.Public ,null, new Type[] { typeof(string), typeof(bool) }, null); 
-			public static bool IsIkCtrlO118 {
-				get {
+			public static bool IsIkCtrlO118
+			{
+				get
+				{
 					if (_typFLIK != null)
 					{
+#if DEBUG
+						Console.WriteLine($"[XTMS]  FullBodyIKCtrl type found(_typIKO118).");
+#endif
 						var m = _typFLIK.GetMethod("GetIKData", BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(string), typeof(bool) }, null);
+#if DEBUG
+						Console.WriteLine($"[XTMS]  GetIKData method existence(_typIKO118): {m != null}");
+#endif
 						return m != null;
 					}
+#if DEBUG
+					Console.WriteLine($"[XTMS]  FullBodyIKCtrl type not found(_typIKO118).");
+#endif
 					return false;
-				} }
+				}
+			}
 
 			// com3d2 1.32~
 			public static Type _typIKO132 = Assembly.Load("Assembly-CSharp").GetType("IKCtrlData")?.GetNestedType("IKSettingData");
-			public static bool IsIkCtrlO132 { get { return _typIKO132 != null; } }
+			public static bool IsIkCtrlO132
+			{
+				get
+				{
+#if DEBUG
+					Console.WriteLine($"[XTMS]  Checking for nested IKSettingData existence(_typIKO132): {_typIKO132 != null}");
+#endif
+					return _typIKO132 != null;
+				}
+			}
 
-			public static bool IsNewIK { get { return IsIkCtrlO117 || IsIkMgr159; } }
+			public static bool IsNewIK
+			{
+				get
+				{
+					var result = IsIkCtrlO117 || IsIkMgr159;
+#if DEBUG
+					Console.WriteLine($"[XTMS]  IsNewIK result: {result}");
+#endif
+					return result;
+				}
+			}
 
 			static IkXT()
 			{
@@ -10872,7 +10920,7 @@ namespace ExtensionMethods
 			fiVechand.SetValue(ikm, v3);
 		}
 
-		static MethodInfo miIkcmoProc1 = typeof(TBody.IKCMO).GetMethod("Proc", BindingFlags.Public | BindingFlags.Instance, null, 
+		static MethodInfo miIkcmoProc1 = typeof(TBody.IKCMO).GetMethod("Proc", BindingFlags.Public | BindingFlags.Instance, null,
 			new Type[] { typeof(Transform), typeof(Transform), typeof(Transform), typeof(Vector3), typeof(Vector3) }, null);
 		static MethodInfo miIkcmoProc = typeof(TBody.IKCMO).GetMethod("Proc", BindingFlags.Public | BindingFlags.Instance);
 		public static void IKCmoProc(this TBody body, bool handRight, Transform bone, Vector3 tgt, Vector3 offset)
@@ -11591,7 +11639,7 @@ namespace BoneLink
 
 			Transform gotr_mas = master.gameObject.transform;
 			Transform gotr_slv = slave.gameObject.transform;
-			
+
 			Maid man = master;
 			Maid maid = slave;
 			if (!master.boMAN)
@@ -11747,9 +11795,9 @@ namespace BoneLink
 				//name = Regex.Replace(name, @"Spine1a", @"Spine2");
 				//name = Regex.Replace(name, @"Bip01", @"ManBip");
 				name = name.Replace(@"Bip01", @"ManBip");
-				
-				
-				
+
+
+
 				if (name != "") {
 
 					// luvoid - added Regex statement to support source@destination bones
@@ -11796,7 +11844,7 @@ namespace BoneLink
 					dest["Bip01 L Toe0"] = Quaternion.Lerp(new Quaternion(q0[0], q0[1], q0[2], q0[3]), bn.Value, 0.5f);
 				}
 
-				
+
 			}
 			return dest;
 		}
@@ -11840,7 +11888,7 @@ namespace BoneLink
 
 namespace XtHandMgr
 {
-	// 公式のArmFinger : FingerBlend.BaseFingerより改造 
+	// 公式のArmFinger : FingerBlend.BaseFingerより改造
 	public class BlendMgr
 	{
 		bool isR = true;
@@ -11878,7 +11926,7 @@ namespace XtHandMgr
 					{
 						needInit = true;
 						UnityEngine.Debug.LogWarningFormat("XtMS: 指のブレンドマネージャを再起動(リトライ=残{0})", retry);
-						
+
 						retry--;
 					}
 					else
@@ -11901,7 +11949,7 @@ namespace XtHandMgr
 				var time = Time.time * animSpeed % 3f;
 				if (time > 1f)
 				{
-					time = (time - 1f) / 2f + 1f; 
+					time = (time - 1f) / 2f + 1f;
 				}
 				valG = Mathf.SmoothStep(Mathf.Clamp01(valG), Mathf.Clamp01(valG + animRange), Mathf.PingPong(time, 1f));
 			}
@@ -12442,7 +12490,7 @@ namespace Defines
 
 		private static List<string> _MaidBones = new List<string>();
 		private static List<string> _ManBones  = new List<string>();
-		
+
 		private static string[] GetBoneNamesFromFile(string fileName, bool fullPath = false)
 		{
 			if (!fullPath)
@@ -12457,7 +12505,7 @@ namespace Defines
 				return none;
 			}
 
-			
+
 
 			return System.IO.File.ReadAllLines(fileName);
 		}
@@ -12504,7 +12552,7 @@ namespace Defines
 			return null;
 		}
 
-		public static string[] MaidBones { 
+		public static string[] MaidBones {
 			get {
 				if (_MaidBones.Count <= 0)
 				{
@@ -12512,7 +12560,7 @@ namespace Defines
 					AppendToMaidBones("xtCustomMaidBones.txt");
 				}
 				return _MaidBones.ToArray();
-			}  
+			}
 		}
 
 		public static string[] ManBones
@@ -12875,7 +12923,7 @@ namespace VYMModule
 			public int vExciteLevelThresholdV1 = 100;           //　興奮レベル１→２閾値
 			public int vExciteLevelThresholdV2 = 200; //180           //　興奮レベル２→３閾値
 			public int vExciteLevelThresholdV3 = 250;           //　興奮レベル３→４閾値
-			public int iYodareAppearLevelV = 3;                 //　所定の興奮レベル以上でよだれをつける（１～４のどれかを入れる、０で無効） 
+			public int iYodareAppearLevelV = 3;                 //　所定の興奮レベル以上でよだれをつける（１～４のどれかを入れる、０で無効）
 
 			public int vStateMajor30Threshold = 200;           //　Voice20→30しきい値
 
@@ -13668,7 +13716,7 @@ namespace VYMModule
 					if (i_vb_state_m > 0)
 					{
 						vStateMajor = i_vb_state_m;
-						
+
 						if (mCate != XtMasterSlave.AnimeState.State.uke)
 						{
 							// 受け以外ではmasterはスタンしない
@@ -13779,7 +13827,7 @@ namespace VYMModule
 			switch (cfg.eVoiceMode)
 			{
 				case VoiceMode.オートモード:
-					// オートモードならスキップ 
+					// オートモードならスキップ
 					break;
 
 				case VoiceMode.通常固定:
@@ -14011,7 +14059,7 @@ namespace VYMModule
 					}
 				}
 
-				// v0027 ボイスセット→ボイスリスト 
+				// v0027 ボイスセット→ボイスリスト
 				if (voiceSet != null && voiceSet.Files.Length > 0)
 				{
 					VoiceList = voiceSet.Files;
@@ -14302,14 +14350,14 @@ namespace VYMModule
 
 #region 旧音声ルーチン
 #if false
-		
+
 		//メイドの音声再生処理
 		private void MaidVoicePlay(Maid vm, int Num)
 		{
 
 			//フェラしているかのチェック
 			checkBlowjobing(vm, Num);
-			
+
 			string sPersonal = vm.Param.status.personal.ToString();
 			string[] VoiceList = new string[1];
 			int vi = 0;
@@ -14815,7 +14863,7 @@ namespace VYMModule
 
 					if (vMaidStun) MouthMode[Num] = 3;  //放心中は無条件でアヘらせる
 														//}
-														
+
 					//フェラの時は顔をカメラに向けないようにする
 					if (bIsBlowjobing[Num] == 2)
 					{
@@ -14848,7 +14896,7 @@ namespace AudioUtil
 
 		/// <summary>
 		///  GameMain.Instance.SoundMgr.PlaySe()でセットしたSEの再生情報をコンソールに書き出すサンプル
-		///  
+		///
 		///  公式のPlaySeメソッドから呼ばれている、音声ファイルが既に登録済みかのチェックルーチンを参考にしました
 		/// </summary>
 		public static AudioSourceMgr[] m_aryAudioMan = null;

@@ -620,8 +620,10 @@ namespace CM3D2.XtMasterSlave.Plugin
         {
 #if COM3D2
             return getPlginDir() + @"\Config\XtMasterSlave\User_SaveData\" + System.IO.Path.GetFileName(inipath);
-#endif
+
+#else
             return @"XtMsterSlave\User_SaveData\" + System.IO.Path.GetFileName(inipath);
+#endif
         }
 
         //プリセット用INIファイル読み書き

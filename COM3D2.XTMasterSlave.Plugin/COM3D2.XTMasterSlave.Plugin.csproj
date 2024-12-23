@@ -19,7 +19,7 @@
   <DebugType>full</DebugType>
   <Optimize>false</Optimize>
   <OutputPath>bin\Debug\</OutputPath>
-  <DefineConstants>DEBUG;TRACE;COM3D2</DefineConstants>
+  <DefineConstants>DEBUG;TRACE;COM3D2;COM3D2only</DefineConstants>
   <ErrorReport>prompt</ErrorReport>
   <WarningLevel>4</WarningLevel>
 </PropertyGroup>
