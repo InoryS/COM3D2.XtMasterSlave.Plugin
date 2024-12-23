@@ -37,4 +37,11 @@ jobs:
         with:
           name: COM3D2.XtMasterSlave.Plugin
           path: /home/runner/work/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/COM3D2.XTMasterSlave.Plugin/bin/Release/net35/COM3D2.XTMasterSlave.Plugin.dll
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: COM3D2.XtMasterSlave.IKO132
+          path: /home/runner/work/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.IKO132/bin/Release/net35/COM3D2.XtMasterSlave.IKO132.xdll
+
     
