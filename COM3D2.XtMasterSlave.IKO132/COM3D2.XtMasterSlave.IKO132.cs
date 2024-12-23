@@ -16,7 +16,7 @@ namespace XtMasterSlave_IK_XDLL
         public const string INFO = "Fixed by @ghorsington on Twitter & InoryS";
 
         public static bool boAnime = false; //?
-        public static bool IKBend = false;  //
+        public static bool IKBend = false; //
 
         public override bool IsNewPointIK(Maid m, string hand = "右手")
         {
@@ -85,10 +85,11 @@ namespace XtMasterSlave_IK_XDLL
         }
 
         //public override void IkClear(Maid tgt, List<string> listHand, XtMasterSlave.MsLinkConfig mscfg, IKCtrlData.IKAttachType IkType = (IKCtrlData.IKAttachType)(-1))
-        public override void IkClear(Maid tgt, List<string> listHand, XtMasterSlave.MsLinkConfig mscfg, int IkType = (-1))
+        public override void IkClear(Maid tgt, List<string> listHand, XtMasterSlave.MsLinkConfig mscfg,
+            int IkType = (-1))
         {
             List<IKCtrlData.IKAttachType> listTypes = new List<IKCtrlData.IKAttachType>
-                                    { IKCtrlData.IKAttachType.NewPoint, IKCtrlData.IKAttachType.Rotate };
+                { IKCtrlData.IKAttachType.NewPoint, IKCtrlData.IKAttachType.Rotate };
 
             listHand.ToList().ForEach(h =>
             {
@@ -130,14 +131,14 @@ namespace XtMasterSlave_IK_XDLL
                     if (iks.MyType != IKCtrlData.IKAttachType.Rotate)
                     {
                         if (IkType >= 0 && IkType != (int)IKCtrlData.IKAttachType.Rotate
-                                && Enum.IsDefined(typeof(IKCtrlData.IKAttachType), IkType))
+                                        && Enum.IsDefined(typeof(IKCtrlData.IKAttachType), IkType))
                         {
                             iks.ChangeIKType((IKCtrlData.IKAttachType)IkType);
                         }
                         else
                         {
                             if (mscfg != null)
-                                iks.ChangeIKType(GetDefType(mscfg));/*fix v5.0
+                                iks.ChangeIKType(GetDefType(mscfg)); /*fix v5.0
                             else
                                 iks.ChangePointType(IKCtrlData.IKAttachType.NewPoint);*/
                         }
@@ -150,7 +151,7 @@ namespace XtMasterSlave_IK_XDLL
         {
             List<string> listHand = new List<string> { "右手", "左手" };
             List<IKCtrlData.IKAttachType> listTypes = new List<IKCtrlData.IKAttachType>
-                                    { IKCtrlData.IKAttachType.NewPoint, IKCtrlData.IKAttachType.Rotate };
+                { IKCtrlData.IKAttachType.NewPoint, IKCtrlData.IKAttachType.Rotate };
 
             listHand.ToList().ForEach(h =>
             {
@@ -179,12 +180,16 @@ namespace XtMasterSlave_IK_XDLL
                             {
                                 angle = ((!(angle < 0f)) ? (angle - 360f) : (angle + 360f));
                             }
+
                             return angle;
                         }
 
                         if (IkXT.IsIkCtrlO117)
                         {
-                            ikcs.SetIKSetting(t, IKCtrlData.IKExecTiming.Normal, ikm.curTargetData.TgtChara, ikm.curTargetData.Tgt_AttachSlot, ikm.curTargetData.Tgt_AttachName, ikm.curTargetData.AxisTgt, ikm.curTargetData.Target, ikm.curTargetData.TgtOffset, ikm.DoAnimation);
+                            ikcs.SetIKSetting(t, IKCtrlData.IKExecTiming.Normal, ikm.curTargetData.TgtChara,
+                                ikm.curTargetData.Tgt_AttachSlot, ikm.curTargetData.Tgt_AttachName,
+                                ikm.curTargetData.AxisTgt, ikm.curTargetData.Target, ikm.curTargetData.TgtOffset,
+                                ikm.DoAnimation);
                             //ikcs.SetIKSetting(t, false, ikm.TgtMaid, ikm.Tgt_AttachSlot, ikm.Tgt_AttachName, ikm.AxisTgt, ikm.Target, ikm.TgtOffset, ikm.DoAnimation, ikm.BlendTime);
                             //iks.SetIKSetting(ikm.TgtMaid, ikm.Tgt_AttachSlot, ikm.Tgt_AttachName, ikm.AxisTgt, ikm.Target, ikm.TgtOffset, ikm.DoAnimation, ikm.BlendTime);
                         }
@@ -218,21 +223,23 @@ namespace XtMasterSlave_IK_XDLL
                             iks.curTargetData.TgtOffset.z = fixAngle(ikm.curTargetData.TgtOffset.z + v3rot.z);
                         }
                     }
-
                 });
             });
 
             //needInit = true;
         }
-        
-        public override void SetHandIKRotate(string handName, Maid master, Maid slave, string boneTgtname, Vector3 v3HandLOffsetRot)
+
+        public override void SetHandIKRotate(string handName, Maid master, Maid slave, string boneTgtname,
+            Vector3 v3HandLOffsetRot)
         {
-            slave.IKTargetToBone(handName, master, boneTgtname, v3HandLOffsetRot, IKCtrlData.IKAttachType.Rotate, false, boAnime, IKCtrlData.IKExecTiming.Normal);
+            slave.IKTargetToBone(handName, master, boneTgtname, v3HandLOffsetRot, IKCtrlData.IKAttachType.Rotate, false,
+                boAnime, IKCtrlData.IKExecTiming.Normal);
 
             //slave.IKTargetToBone(handName, master, boneTgtname, v3HandLOffsetRot, IKCtrlData.IKAttachType.Rotate, false, 0f, boAnime, false);
         }
 
-        public override void SetHandIKTarget(XtMasterSlave.MsLinkConfig mscfg, string handName, Maid master, Maid slave, int slot_no, string attach_name, Transform target, Vector3 v3HandLOffset)
+        public override void SetHandIKTarget(XtMasterSlave.MsLinkConfig mscfg, string handName, Maid master, Maid slave,
+            int slot_no, string attach_name, Transform target, Vector3 v3HandLOffset)
         {
             /*if (needInit)
             {
@@ -245,7 +252,8 @@ namespace XtMasterSlave_IK_XDLL
 #endif
             }*/
 
-            slave.IKCtrl.GetIKData(handName, IKBend).SetIKSetting(GetDefType(mscfg), IKCtrlData.IKExecTiming.Normal, master, slot_no, attach_name, null, target, v3HandLOffset, boAnime);
+            slave.IKCtrl.GetIKData(handName, IKBend).SetIKSetting(GetDefType(mscfg), IKCtrlData.IKExecTiming.Normal,
+                master, slot_no, attach_name, null, target, v3HandLOffset, boAnime);
 
             HandFootIKData ikdata = slave.IKCtrl.GetIKData<HandFootIKData>(handName);
             ikdata.CorrectType = HandFootIKData.BorderCorrectType.Bone;
@@ -262,6 +270,7 @@ namespace XtMasterSlave_IK_XDLL
 #endif
 
         Dictionary<Maid, string> lastAnimeFNs = new Dictionary<Maid, string>();
+
         private void IKInit(Maid slave, XtMasterSlave.MsLinks ms, XtMasterSlave.MsLinkConfig mscfg)
         {
             var fik = slave.body0.IKCtrl.GetNonPublicField<RootMotion.FinalIK.FullBodyBipedIK>("m_FullbodyIK");
@@ -286,8 +295,8 @@ namespace XtMasterSlave_IK_XDLL
                 animStop = false;
             }
 
-            solver.spineStiffness = 1f;      //背骨の硬さ
-            solver.pullBodyVertical = 0.5f;  //ボディエフェクター位置補正
+            solver.spineStiffness = 1f; //背骨の硬さ
+            solver.pullBodyVertical = 0.5f; //ボディエフェクター位置補正
             solver.pullBodyHorizontal = 0f;
             solver.spineMapping.twistWeight = 0f;
 
@@ -326,8 +335,9 @@ namespace XtMasterSlave_IK_XDLL
                 solver.rightShoulderEffector.positionWeight = 0f;
                 solver.leftShoulderEffector.positionWeight = 0f;
             }
+
             if (mscfg != null && mscfg.doFinalIKThighMove)
-            { 
+            {
                 solver.bodyEffector.rotationWeight = 0f;
 
                 solver.rightThighEffector.positionWeight = 0f;
@@ -345,11 +355,13 @@ namespace XtMasterSlave_IK_XDLL
                 solver.rightLegMapping.weight = mscfg.fFinalIKLegWeight; //0.5f;
                 solver.leftLegMapping.weight = mscfg.fFinalIKLegWeight; //0.5f;
             }
+
             solver.rightLegMapping.maintainRotationWeight = 1f;
             solver.leftLegMapping.maintainRotationWeight = 1f;
         }
 
-#region for TEST
+        #region for TEST
+
 #if DEBUG
         private void IKInit4OldPoint(Maid slave)
         {
@@ -376,7 +388,7 @@ namespace XtMasterSlave_IK_XDLL
                     e.target.transform.rotation = e.bone.rotation;
                 }
             }
-            
+
             foreach(var m in solver.limbMappings)
             {
                 m.weight = 0f;
@@ -553,13 +565,15 @@ namespace XtMasterSlave_IK_XDLL
             }
         }
 #endif
-#endregion
+
+        #endregion
 
         private static void Sync(Transform tr1, Transform tr2)
         {
             tr1.position = tr2.position;
             tr1.rotation = tr2.rotation;
         }
+
         private static void Sync(RootMotion.FinalIK.IKEffector eff)
         {
             eff.position = eff.bone.position;
@@ -568,6 +582,7 @@ namespace XtMasterSlave_IK_XDLL
             eff.target.rotation = eff.bone.rotation;
             eff.PinToBone(1f, 1f);*/
         }
+
         private static void WeightZero(RootMotion.FinalIK.IKEffector eff)
         {
             eff.positionWeight = 0f;
@@ -609,10 +624,13 @@ namespace XtMasterSlave_IK_XDLL
             }
             else if (data.curTargetData.Tgt_AttachName != string.Empty)
             {
-                if (data.curTargetData.TgtChara != null && data.curTargetData.TgtChara.body0 != null && data.curTargetData.Tgt_AttachSlot >= 0 && data.curTargetData.TgtChara.body0.goSlot[data.curTargetData.Tgt_AttachSlot].morph != null)
+                if (data.curTargetData.TgtChara != null && data.curTargetData.TgtChara.body0 != null &&
+                    data.curTargetData.Tgt_AttachSlot >= 0 &&
+                    data.curTargetData.TgtChara.body0.goSlot[data.curTargetData.Tgt_AttachSlot].morph != null)
                 {
                     Vector3 vector;
-                    data.curTargetData.TgtChara.body0.goSlot[data.curTargetData.Tgt_AttachSlot].morph.GetAttachPoint(data.curTargetData.Tgt_AttachName, out pos, out rot, out vector, false);
+                    data.curTargetData.TgtChara.body0.goSlot[data.curTargetData.Tgt_AttachSlot].morph
+                        .GetAttachPoint(data.curTargetData.Tgt_AttachName, out pos, out rot, out vector, false);
                     proc = true;
                 }
                 else
@@ -641,6 +659,7 @@ namespace XtMasterSlave_IK_XDLL
                 ctrl.IKCmo.Porc(trh.parent.parent, trh.parent, trh, pos, rot * offset, ctrl);
                 return true;
             }
+
             return false;
         }
 
@@ -667,7 +686,7 @@ public static class Extentions
     public static T GetNonPublicField<T>(this object obj, string name)
     {
         var ret = obj.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(obj);
-        
+
         if (ret is T)
             return (T)ret;
         return default(T);
