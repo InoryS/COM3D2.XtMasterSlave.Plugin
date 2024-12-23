@@ -27,11 +27,11 @@ namespace CM3D2.XtMasterSlave.Plugin
 {
 #if COM3D2
 	[PluginFilter("COM3D2x64"), PluginFilter("COM3D2OHx64"),
-	PluginName("COM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.5.0")]
+	PluginName("COM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.0")]
 #else
 	[PluginFilter("CM3D2x64"), PluginFilter("CM3D2x86"), PluginFilter("CM3D2VRx64"),
 	PluginFilter("CM3D2OHx64"), PluginFilter("CM3D2OHx86"), PluginFilter("CM3D2OHVRx64"),
-	PluginName("CM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.5.0")]
+	PluginName("CM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.0")]
 #endif
 	public class XtMasterSlave : ExPluginBase
 	{
