@@ -38,7 +38,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 		#region 定数宣言
 		public readonly static string PLUGIN_NAME = "XtMasterSlave";
 
-		public readonly static string PLUGIN_VERSION = "0.0.5.0";
+		public readonly static string PLUGIN_VERSION = "0.0.6.0";
 		private const int WINID_COFIG = 99101;
 		const string PluginCfgFN = "XtMasterSlave.ini";
 		const string YotogiCfgFN = "XtMasterSlave_Yotogi.ini";
