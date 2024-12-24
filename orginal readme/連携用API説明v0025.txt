@@ -1,0 +1,92 @@
+XtMasterSlave連携用APIメソッド 
+
+■履歴
+　0.0.2.5：新規実装
+
+■説明
+　基本的にはふたなりプラグイン作者様のえぼさん用に作ったもの。
+　ConfigMsLink以外は多少エラーチェックも入ってます。
+
+　コンパイル時に参照先にしとくのが楽ですが、XtMSプラグインが無いと
+　ロード時にエラーが起きて全く動かなくなります。
+　避けたい場合、実行時にリンクが必要なのでGetMethodとかで適当に使ってください。
+
+
+namespace CM3D2.XtMasterSlave.Plugin
+class XtMasterSlave.MsUtil内（MsUtilは入れ子クラス）
+
+
+/// <summary>
+///     スレイブの選択
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <param name="memNum">Slaveリストのキャラ番号</param>
+/// <returns>成功ならTrue</returns>
+public static bool SelectSlave(int pageNum, int memNum)
+
+
+/// <summary>
+///     マスターの選択
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <param name="memNum">Masterリストのキャラ番号</param>
+/// <returns>成功ならTrue</returns>
+public static bool SelectMaster(int pageNum, int memNum)
+
+
+/// <summary>
+///     M/Sモード変更
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <param name="isMaidMaster">メイドがマスター</param>
+public static void ChangeMsMode(int pageNum, bool isMaidMaster)
+
+
+/// <summary>
+///     指定ページのSlaveまたはMaster候補者リストを返す
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <param name="GetMasters">マスターを取得したい場合True（FalseでSlave）</param>
+/// <returns>メイドまたは男リスト、エラーでNULL</returns>
+public static Maid[] GetMembersList(int pageNum, bool GetMasters)
+
+
+/// <summary>
+///     指定ページで選択中のキャラクター番号
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <param name="GetMasters">マスターを取得したい場合True（FalseでSlave）</param>
+/// <returns>エラーまたは未選択なら-1</returns>
+public static int GetMemberNum(int pageNum, bool GetMaster)
+
+
+/// <summary>
+///     Msリンクの開始か停止状態取得
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <returns>実行中ならTrue</returns>
+public static bool IsStartMsLink(int pageNum)
+
+
+/// <summary>
+///     Msリンクの開始か停止
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <param name="Stop">停止したい時はTrue</param>
+/// <returns>成功ならTrue</returns>
+public static bool StartMsLink(int pageNum, bool Stop)
+
+
+/// <summary>
+///     上級者向けリンク状態設定。アタッチ解除とかしないので後始末出来る人用
+/// </summary>
+/// <param name="pageNum">ページ番号</param>
+/// <param name="StackPos">位置の重ね有無</param>
+/// <param name="StackPos">局部で位置合わせ有無</param>
+/// <param name="AtcMsHands">両手をマスターにアタッチ</param>
+/// <param name="CopyIkHands">両手のIKコピー</param>
+/// <param name="PosSync">位置のみリンク有無</param>
+/// <param name="VoiceAndFacePlay">ボイス＆フェイス変更</param>
+/// <returns>成功ならTrue</returns>
+public static bool ConfigMsLink(int pageNum, bool StackPos, bool AutoCnkPos, bool AtcMsHands, bool CopyIkHands, bool PosSync, bool VoiceAndFacePlay)
+
