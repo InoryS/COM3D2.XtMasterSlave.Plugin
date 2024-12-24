@@ -2426,7 +2426,7 @@ namespace CM3D2.XtMasterSlave.Plugin
             SaveMyConfigs();
         }
 
-        public void Start()
+        void Start()
         {
             // add button to GearMenu
             GearMenu.Buttons.Add(
