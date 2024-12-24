@@ -25,9 +25,9 @@ using UnityEngine.SceneManagement;
 namespace CM3D2.XtMasterSlave.Plugin
 {
 #if COM3D2
-    [PluginName("COM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.0")]
+    [PluginName("COM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.1")]
 #else
-	[PluginName("CM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.0")]
+	[PluginName("CM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.1")]
 #endif
     public class XtMasterSlave : ExPluginBase
     {
@@ -35,7 +35,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 
         public readonly static string PLUGIN_NAME = "XtMasterSlave";
 
-        public readonly static string PLUGIN_VERSION = "0.0.6.0";
+        public readonly static string PLUGIN_VERSION = "0.0.6.1";
         private const int WINID_COFIG = 99101;
         const string PluginCfgFN = "XtMasterSlave.ini";
         const string YotogiCfgFN = "XtMasterSlave_Yotogi.ini";
@@ -2428,6 +2428,39 @@ namespace CM3D2.XtMasterSlave.Plugin
 
         public void Start()
         {
+            // add button to GearMenu
+            GearMenu.Buttons.Add(
+                "XtMaterSlave",
+                "Toggle XtMaterSlave GUI",
+                Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAAXFQTFRF////+fn57u7u3d3dzc3NxsbGxcXFzMzMpqamo6Ojn5+f2dnZqKioxMTE+/v7goKC0dHR39/ff39/8fHx7e3ttbW1eHh4KSkp/v7+Ozs7YmJiGxsbtra2vLy8ubm5JCQkd3d3j4+PGhoa9PT0ycnJAwMDp6enCAgIvb29cXFxBgYGLS0tPz8/e3t7cHBwAAAAampqbm5ubW1tAgICyMjIHx8fjY2NcnJyJSUlHBwct7e3ZWVl9vb2enp6MDAwkJCQ3NzcBAQE1NTUqqqqCQkJT09P7+/vdXV1IiIiDg4OSEhInZ2dLi4umpqaBQUF0tLSLCws8vLyurq6h4eHeXl5lJSULy8vra2tKCgo3t7eMjIy2NjYV1dXQEBAvr6+6enpi4uLfX1919fX5OTkTExMAQEBzs7OrKys6urqHR0dc3Nz8PDwY2NjFRUVrq6uS0tLCwsLBwcH+Pj4wsLC4eHhtLS0CgoKPT09FhYW/Pz8/f39Jmb+UAAAAZlJREFUeJxjZCAAGIlQwAgCGCr/M/wHAZA4EytIASYASv/+B1LAzfj9L1bTmTn/fwUp4P3/BcjjY2T8wMAgyMj4lpX/DVQFD+NnkAJWgdcgnhjjq/8SjIzPGKQZn0AViH74DVIgy/gI7Fw5xgeKjIx3kRTI/X8MUiDHAFbAoALyzQ0GTRB1GaIAKIOkgEGPkfECkEIyAU2B4T/mc/gU8Eo91GY8g1uBshDjKXPGk/8ZLBmPYVVgfe//C5vHcocZ7BgPYlOg8V/yANAnsoz7nBlfi+3G6kgMQJoCKSGpXQwM7k+v/7XhBgXVVnQFPm9FNjOIsBszbjSSO2PKyLgWXYG25tHnDKGPPj/7ELblGzYrtHUYGZdHMZ5/9iEGaMFCbAo4GRl/LNN69iEZGKvHrGehKwgQB2p8vRqoAMjJZmR8sh7dkUqT8hmv7Sq8txFkeNEd1V64AkiCASoomfyTAaig9M56CZaonn/wBANJcgHiM0FagVbYGnB9457yBZHkIIkWCVSeVJBoAzGgiZZgsieYcQhmPfyAoAIAUSSvIQj4e8UAAAAASUVORK5CYII="),
+                (go) => ToggleGUI()
+            );
+        }
+
+        void ToggleGUI()
+        {
+            //GUIの切り替え
+            GuiFlag = !GuiFlag;
+            XtMs2ndWnd.boShow = false;
+
+            if (!GuiFlag && _Gizmo.Visible)
+            {
+                //_Gizmo.Visible = false;
+                GizmoVisible(false);
+            }
+
+            if (!GuiFlag)
+            {
+                GizmoHsVisible(false);
+                CloseAllCombos();
+            }
+            else
+            {
+                showWndMin = false;
+            }
+#if DEBUG
+            Console.WriteLine("[XTMS] GUI toggled");
+#endif
         }
 
         public void OnApplicationQuit()
@@ -9239,25 +9272,7 @@ namespace CM3D2.XtMasterSlave.Plugin
             //キーチェック
             if (InputEx.GetKeyDownEx(cfg.hotkey_GUI, cfg.hotkey_GUI_Modifier))
             {
-                //GUIの切り替え
-                GuiFlag = !GuiFlag;
-                XtMs2ndWnd.boShow = false;
-
-                if (!GuiFlag && _Gizmo.Visible)
-                {
-                    //_Gizmo.Visible = false;
-                    GizmoVisible(false);
-                }
-
-                if (!GuiFlag)
-                {
-                    GizmoHsVisible(false);
-                    CloseAllCombos();
-                }
-                else
-                {
-                    showWndMin = false;
-                }
+                ToggleGUI();
             }
 
             if (GuiFlag)
