@@ -535,6 +535,8 @@ namespace CM3D2.XtMasterSlave.Plugin
             public bool doIKTargetMHandSpCustom = false; // アタッチ先変更
             public bool doIKTargetMHandSpCustom_v2 = true; // v5.0 アタッチ先変更2（角度指定バージョン2）
 
+            public bool ignoreFootRotation = false; // ignore Foot Rotation (for com3d2.highheel.plugin)
+
             public bool chkIkSpCustomR_v2()
             {
                 return doIKTargetMHandSpCustom && doIKTargetMHandSpCustom_v2 &&
@@ -7627,6 +7629,10 @@ namespace CM3D2.XtMasterSlave.Plugin
                     }
                 }
 
+
+                p_mscfg.ignoreFootRotation = GUI.Toggle(new Rect(ItemX + 10, pos_y, 90, ItemHeight), p_mscfg.ignoreFootRotation, " ignore Foot Rotation(highheel)", gsToggle);
+
+
                 //サブメンバーコントロール
                 if (ProcSubMemberCtrls(ref pos_y, ref rcItem, ms_, slave, p_mscfg))
                 {
@@ -12010,6 +12016,11 @@ namespace BoneLink
             return tout;
         }
 
+        public bool IsFootBone(string boneName)
+        {
+            return boneName.ToLower().Contains("foot") || boneName.ToLower().Contains("toe");
+        }
+
         //static Maid slave_last_ = null;
         //public static void Try(Maid master, Maid slave, bool enabled, bool org_pelvis)
         public void Try(Maid master, Maid slave, bool enabled, bool org_pelvis, bool org_clit, Vector3 v3StackOffset,
@@ -12174,6 +12185,10 @@ namespace BoneLink
                     {
                         if (bone == "Mune_R" || bone == "Mune_L") //胸ボーンbugfix v0011
                             continue;
+
+                        if (mcfg.ignoreFootRotation && IsFootBone(bone)) { // ignore Foot Rotation for COM3D2.highheel.plugin
+                            continue;
+                        }
 
                         /* test v5.0
                         if (mcfg.doIKTargetMHand && !mcfg.doIK159NewPointToDef && (bone.Contains("UpperArm") || bone.Contains("Forearm") || bone.Contains("Hand")))
