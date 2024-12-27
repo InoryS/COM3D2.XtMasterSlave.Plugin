@@ -7630,7 +7630,7 @@ namespace CM3D2.XtMasterSlave.Plugin
                 }
 
 
-                p_mscfg.ignoreFootRotation = GUI.Toggle(new Rect(ItemX + 10, pos_y, 90, ItemHeight), p_mscfg.ignoreFootRotation, " ignore Foot Rotation(highheel)", gsToggle);
+                p_mscfg.ignoreFootRotation = GUI.Toggle(new Rect(ItemX, pos_y, ItemWidth, ItemHeight), p_mscfg.ignoreFootRotation, "ignore foot rotation(high heel)", gsToggle);
 
 
                 //サブメンバーコントロール
@@ -11069,7 +11069,7 @@ namespace ExtensionMethods
             {
                 get
                 {
-#if DEBUG
+#if DEBUG_VERSION
 					Console.WriteLine($"[XTMS]  Checking for IKMgrData existence(_typIKM159): {_typIKM159 != null}");
 #endif
                     return _typIKM159 != null;
@@ -11083,7 +11083,7 @@ namespace ExtensionMethods
             {
                 get
                 {
-#if DEBUG
+#if DEBUG_VERSION
 					Console.WriteLine($"[XTMS]  Checking for IKCtrlData existence(_typIKO117): {_typIKO117 != null}");
 #endif
                     return _typIKO117 != null;
@@ -11099,17 +11099,17 @@ namespace ExtensionMethods
                 {
                     if (_typFLIK != null)
                     {
-#if DEBUG
+#if DEBUG_VERSION
 						Console.WriteLine($"[XTMS]  FullBodyIKCtrl type found(_typIKO118).");
 #endif
                         var m = _typFLIK.GetMethod("GetIKData", BindingFlags.Instance | BindingFlags.Public, null,
                             new Type[] { typeof(string), typeof(bool) }, null);
-#if DEBUG
+#if DEBUG_VERSION
 						Console.WriteLine($"[XTMS]  GetIKData method existence(_typIKO118): {m != null}");
 #endif
                         return m != null;
                     }
-#if DEBUG
+#if DEBUG_VERSION
 					Console.WriteLine($"[XTMS]  FullBodyIKCtrl type not found(_typIKO118).");
 #endif
                     return false;
@@ -11124,7 +11124,7 @@ namespace ExtensionMethods
             {
                 get
                 {
-#if DEBUG
+#if DEBUG_VERSION
 					Console.WriteLine($"[XTMS]  Checking for nested IKSettingData existence(_typIKO132): {_typIKO132 != null}");
 #endif
                     return _typIKO132 != null;
@@ -11136,7 +11136,7 @@ namespace ExtensionMethods
                 get
                 {
                     var result = IsIkCtrlO117 || IsIkMgr159;
-#if DEBUG
+#if DEBUG_VERSION
 					Console.WriteLine($"[XTMS]  IsNewIK result: {result}");
 #endif
                     return result;
@@ -12016,9 +12016,13 @@ namespace BoneLink
             return tout;
         }
 
-        public bool IsFootBone(string boneName)
+        public static bool IsFootBone(string boneName)
         {
-            return boneName.ToLower().Contains("foot") || boneName.ToLower().Contains("toe");
+            var lower = boneName.ToLower();
+#if DEBUG_VERSION
+            Console.WriteLine($"IsFootBone: boneName: {boneName} lower: {lower} result: {(lower.Contains("foot") || lower.Contains("toe")).ToString()}");
+#endif
+            return lower.Contains("foot") || lower.Contains("toe");
         }
 
         //static Maid slave_last_ = null;
@@ -12066,6 +12070,10 @@ namespace BoneLink
                 {
                     try
                     {
+                        if (mcfg.ignoreFootRotation && IsFootBone(bone)) { // ignore Foot Rotation for COM3D2.highheel.plugin
+                            continue;
+                        }
+                        
                         // luvoid - added Regex statement to support source@destination bones
                         string searchName =
                             Regex.Replace(bone, @"(.*)@(.*)$",
@@ -12087,6 +12095,10 @@ namespace BoneLink
                 {
                     try
                     {
+                        if (mcfg.ignoreFootRotation && IsFootBone(bone)) { // ignore Foot Rotation for COM3D2.highheel.plugin
+                            continue;
+                        }
+                        
                         Quaternion q;
                         float[] q0;
                         if (dicManPose.TryGetValue(bone, out q))
@@ -12162,6 +12174,10 @@ namespace BoneLink
                 {
                     try
                     {
+                        if (mcfg.ignoreFootRotation && IsFootBone(bone)) { // ignore Foot Rotation for COM3D2.highheel.plugin
+                            continue;
+                        }
+                        
                         // luvoid - added Regex statement to support source@destination bones
                         string searchName =
                             Regex.Replace(bone, @"(.*)@(.*)$",
