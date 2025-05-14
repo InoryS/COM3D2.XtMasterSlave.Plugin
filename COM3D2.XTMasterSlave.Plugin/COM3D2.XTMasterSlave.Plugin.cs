@@ -25,9 +25,9 @@ using UnityEngine.SceneManagement;
 namespace CM3D2.XtMasterSlave.Plugin
 {
 #if COM3D2
-    [PluginName("COM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.1")]
+    [PluginName("COM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.2")]
 #else
-	[PluginName("CM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.1")]
+	[PluginName("CM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.6.2")]
 #endif
     public class XtMasterSlave : ExPluginBase
     {
@@ -35,7 +35,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 
         public readonly static string PLUGIN_NAME = "XtMasterSlave";
 
-        public readonly static string PLUGIN_VERSION = "0.0.6.1";
+        public readonly static string PLUGIN_VERSION = "0.0.6.2";
         private const int WINID_COFIG = 99101;
         const string PluginCfgFN = "XtMasterSlave.ini";
         const string YotogiCfgFN = "XtMasterSlave_Yotogi.ini";
