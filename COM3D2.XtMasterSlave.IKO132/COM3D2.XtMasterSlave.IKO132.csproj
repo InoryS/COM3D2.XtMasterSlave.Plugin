@@ -34,7 +34,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="COM3D2.GameLibs" Version="2.39.0-r.0" />
+    <PackageReference Include="COM3D2.GameLibs" Version="2.43.1-r.0" />
     <Reference Include="UnityInjector">
       <HintPath>..\libs\UnityInjector.dll</HintPath>
     </Reference>
