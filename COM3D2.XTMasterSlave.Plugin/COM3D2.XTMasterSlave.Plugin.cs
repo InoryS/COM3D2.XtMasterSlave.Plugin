@@ -2632,11 +2632,14 @@ namespace CM3D2.XtMasterSlave.Plugin
         private bool checkYotogiScene()
         {
             // OH版は夜伽シーンでもSceneが14にならない(10のまま)ので、YotogiManagerの有無で判別する
-            int iYotogiManagerCount = FindObjectsOfType<YotogiManager>().Length;
-            if (iYotogiManagerCount > 0)
-            {
+            if (FindObjectsOfType<YotogiManager>().Length > 0)
                 return true;
-            }
+
+            // CM3D2互換モードでは同じ "UI Root/YotogiManager" オブジェクトに
+            // YotogiManager ではなく YotogiOldManager が付くため、そちらも見る
+            // （ゲーム側 ScriptManager.TJSFuncIsYotogiSubCharaSelect と同じ判定）
+            if (FindObjectsOfType<YotogiOldManager>().Length > 0)
+                return true;
 
             return false;
         }
