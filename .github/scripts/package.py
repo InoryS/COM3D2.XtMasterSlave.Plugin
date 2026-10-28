@@ -6,9 +6,12 @@
 解压到 COM3D2\\Sybaris\\UnityInjector\\ 即可，包内布局与插件运行时读取的路径一致：
 
     COM3D2.XTMasterSlave.Plugin.dll     插件本体
-    COM3D2.XtMasterSlave.IKO132.xdll    IKCtrl v1.32 的 IK 模块（Assembly.LoadFile 动态加载）
+    COM3D2.XtMasterSlave.IKO132.xdll    仅 COM3D2 2.x：IKCtrl v1.32 的 IK 模块
     Config/                             默认配置 + 预设
     orginal readme/                     原作者帮助文档
+
+--game com3d25 生成单独的 COM3D2.5 安装包，IK 适配器已内置，不包含 IKO132.xdll。
+--game com3d25 creates a separate COM3D2.5 archive with built-in IK support and no IKO132.xdll.
 
 Config/ 与 orginal readme/ 逐字节复制，不做任何转码。仓库里的 Config/*.ini 是 Shift-JIS(CP932)，
 插件侧的 XtIni 按 BOM → 严格 UTF-8 → CP932 的顺序解码，两种编码都能读；但打包时把 CP932 转成
@@ -31,7 +34,7 @@ import os
 import sys
 import zipfile
 
-# 打包进 zip 根目录的两个构建产物 / The two build outputs that go to the zip root
+# 打包进 zip 根目录的构建产物 / Build outputs that go to the zip root
 #
 # 构建产物是 COM3D2.XTMasterSlave.Plugin.dll（csproj 的 AssemblyName，大写 TM），但历次发布
 # 和 README 里用的都是小写 t 的 COM3D2.XtMasterSlave.Plugin.dll。程序集标识不受文件名影响
@@ -104,49 +107,62 @@ def payload_entries(repo_root):
 
 def main():
     parser = argparse.ArgumentParser(description="Assemble the release zip")
+    parser.add_argument("--game", choices=("com3d2", "com3d25"), default="com3d2",
+                        help="目标游戏 / target game (default: com3d2)")
     parser.add_argument("--version", required=True, help="例如 0.0.6.2 / e.g. 0.0.6.2")
     parser.add_argument("--plugin-dll", required=True, help="构建出的插件本体 / built plugin dll")
-    parser.add_argument("--ik-dll", required=True, help="构建出的 IKO132.xdll / built IK module")
+    parser.add_argument("--ik-dll", help="COM3D2 2.x 必需的 IKO132.xdll / required for COM3D2 2.x")
     parser.add_argument("--repo-root", default=".", help="仓库根目录 / repository root")
     parser.add_argument("--output-dir", default="dist", help="zip 输出目录 / output directory")
     args = parser.parse_args()
 
-    repo_root = os.path.abspath(args.repo_root)
+    if args.game == "com3d2" and not args.ik_dll:
+        parser.error("--ik-dll is required for COM3D2 2.x")
+    if args.game == "com3d25" and args.ik_dll:
+        parser.error("--ik-dll must not be supplied for COM3D2.5 3.x")
 
-    for path in (args.plugin_dll, args.ik_dll):
+    repo_root = os.path.abspath(args.repo_root)
+    binaries = [(args.plugin_dll, PLUGIN_DLL)]
+    if args.ik_dll:
+        binaries.append((args.ik_dll, IK_XDLL))
+
+    for path, arcname in binaries:
         if not os.path.isfile(path):
             sys.exit(f"::error::build output not found: {path}")
 
     # zip 名沿用历史发布：COM3D2.XtMasterSlave.Plugin-<version>.zip
     # The name follows the existing releases
     os.makedirs(os.path.join(repo_root, args.output_dir), exist_ok=True)
+    game_name = "COM3D2" if args.game == "com3d2" else "COM3D2.5"
     zip_path = os.path.join(repo_root, args.output_dir,
-                            f"COM3D2.XtMasterSlave.Plugin-{args.version}.zip")
+                            f"{game_name}.XtMasterSlave.Plugin-{args.version}.zip")
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
-        add_file(zf, read_bytes(args.plugin_dll), PLUGIN_DLL)
-        add_file(zf, read_bytes(args.ik_dll), IK_XDLL)
+        for path, arcname in binaries:
+            add_file(zf, read_bytes(path), arcname)
         for arcname, data in payload_entries(repo_root):
             if data is None:
                 add_dir(zf, arcname)
             else:
                 add_file(zf, data, arcname)
 
-    # 自检：两个产物必须在根目录，不许有 pdb，不许混进游戏 / Sybaris / 共用插件的程序集
-    # Sanity check: both outputs at the root, no pdb, no game / Sybaris / shared plugin assemblies
+    # 自检：构建产物必须在根目录，不许有 pdb，不许混进游戏 / Sybaris / 共用插件的程序集
+    # Sanity check: build outputs at the root, no pdb, no game / Sybaris / shared plugin assemblies
     with zipfile.ZipFile(zip_path) as zf:
         names = zf.namelist()
-    for required in (PLUGIN_DLL, IK_XDLL, "Config/XtMasterSlave.ini"):
+    for required in [arcname for path, arcname in binaries] + ["Config/XtMasterSlave.ini"]:
         if required not in names:
             sys.exit(f"::error::{required} missing from {zip_path}")
     bad = [n for n in names
            if n.lower().endswith(".pdb") or os.path.basename(n).lower() in FORBIDDEN_NAMES]
     if bad:
         sys.exit(f"::error::unexpected entries in {zip_path}: {bad}")
+    if args.game == "com3d25" and IK_XDLL in names:
+        sys.exit(f"::error::{IK_XDLL} must not be included in {zip_path}")
 
     size = os.path.getsize(zip_path)
     print(f"built {zip_path} ({len(names)} entries, {size} bytes)")
-    print(f"  root files: {PLUGIN_DLL}, {IK_XDLL}")
+    print("  root files: " + ", ".join(arcname for path, arcname in binaries))
 
 
 if __name__ == "__main__":

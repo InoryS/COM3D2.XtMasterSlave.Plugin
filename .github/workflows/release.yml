@@ -109,10 +109,10 @@ jobs:
       # 两个工程都是 net35：插件本体 + IKO132 的 IK 模块（构建后由 csproj 的 RenameOutput 改成 .xdll）
       # Both projects target net35: the plugin itself and the IKO132 IK module, which the csproj
       # renames to .xdll after the build
-      - name: Build
+      - name: Build COM3D2
         run: dotnet build COM3D2.XTMasterSlave.Plugin.sln -c Release
 
-      - name: Package Release Archive
+      - name: Package COM3D2 Archive
         run: |
           python3 .github/scripts/package.py \
             --version "${{ steps.meta.outputs.version }}" \
@@ -121,7 +121,21 @@ jobs:
             --output-dir dist
           ls -l dist/
 
-      - name: Upload Archive
+      - name: Build and Package COM3D2.5
+        run: |
+          if ! grep -q 'COM3D25_UNITY_2022-Release|Any CPU' COM3D2.XTMasterSlave.Plugin.sln; then
+            echo "This tag has no COM3D2.5 solution configuration; publishing COM3D2 only."
+            exit 0
+          fi
+          dotnet build COM3D2.XTMasterSlave.Plugin.sln -c COM3D25_UNITY_2022-Release
+          python3 .github/scripts/package.py \
+            --game com3d25 \
+            --version "${{ steps.meta.outputs.version }}" \
+            --plugin-dll COM3D2.XTMasterSlave.Plugin/bin/COM3D25_UNITY_2022-Release/net48/COM3D2.XTMasterSlave.Plugin.dll \
+            --output-dir dist
+          ls -l dist/
+
+      - name: Upload Archives
         uses: actions/upload-artifact@v7
         with:
           name: release-archive

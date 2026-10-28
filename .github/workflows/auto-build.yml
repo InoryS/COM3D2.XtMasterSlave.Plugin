@@ -30,10 +30,10 @@ jobs:
       # 两个工程都是 net35：插件本体 + IKO132 的 IK 模块（构建后由 csproj 的 RenameOutput 改成 .xdll）
       # Both projects target net35: the plugin itself and the IKO132 IK module, which the csproj
       # renames to .xdll after the build
-      - name: Build
+      - name: Build COM3D2
         run: dotnet build COM3D2.XTMasterSlave.Plugin.sln -c Release
 
-      - name: Package Release Archive
+      - name: Package COM3D2 Archive
         run: |
           VERSION="$(python3 .github/scripts/version.py)"
           echo "plugin version: ${VERSION}"
@@ -44,7 +44,18 @@ jobs:
             --output-dir dist
           ls -l dist/
 
-      - name: Upload Archive
+      - name: Build and Package COM3D2.5
+        run: |
+          dotnet build COM3D2.XTMasterSlave.Plugin.sln -c COM3D25_UNITY_2022-Release
+          VERSION="$(python3 .github/scripts/version.py)"
+          python3 .github/scripts/package.py \
+            --game com3d25 \
+            --version "${VERSION}" \
+            --plugin-dll COM3D2.XTMasterSlave.Plugin/bin/COM3D25_UNITY_2022-Release/net48/COM3D2.XTMasterSlave.Plugin.dll \
+            --output-dir dist
+          ls -l dist/
+
+      - name: Upload Archives
         uses: actions/upload-artifact@v7
         with:
           name: COM3D2.XtMasterSlave.Plugin
