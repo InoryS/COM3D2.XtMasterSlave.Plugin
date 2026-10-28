@@ -3804,12 +3804,28 @@ namespace CM3D2.XtMasterSlave.Plugin
                 }
             }
 
+            // アタッチ先メイドのスロットからモーフを取り出す（スロット未ロードでも落ちないように）
+            static TMorph GetAttachMorph(Maid maid, int slot)
+            {
+                if (!maid || !maid.body0 || maid.body0.goSlot == null)
+                    return null;
+                if (slot < 0 || slot >= maid.body0.goSlot.Count)
+                    return null;
+
+                TBodySkin skin = maid.body0.goSlot[slot];
+                return skin != null ? skin.morph : null;
+            }
+
             // 戻り値: ツイスト必要か
             public bool lateHandsAtcpProc2(Maid slave)
             {
                 bool needTwist = false;
                 //bkupHandRotR = false;
                 //bkupHandRotL = false;
+
+                // シーン遷移中は body やボーンが既に破棄されていることがある
+                if (!slave || !slave.body0 || !slave.body0.m_Bones)
+                    return false;
 
                 var p_mscfg = cfgs[num_];
                 var p_v3of = v3ofs[num_];
@@ -3818,6 +3834,10 @@ namespace CM3D2.XtMasterSlave.Plugin
                 Maid master = null;
                 if (doMasterSlave)
                     master = this.GetMaster();
+
+                // 読み込み中/破棄済みの master を IK 対象にすると NullReference になる
+                if (master && (!master.body0 || !master.body0.m_Bones))
+                    master = null;
 
                 if (!p_mscfg.doIKTargetMHandSpCustom)
                 {
@@ -3902,12 +3922,12 @@ namespace CM3D2.XtMasterSlave.Plugin
                                 //if (true/*iks.tgtHandR_AttachName != string.Empty && slave.body0.goSlot[iks.tgtHandR_AttachSlot].morph != null*/)
                                 if (iks != null && iks.tgtHandR_AttachSlot >= 0)
                                 {
-                                    if (iks.tgtMaidR != null && iks.tgtMaidR.body0 != null &&
-                                        iks.tgtMaidR.body0.goSlot[iks.tgtHandR_AttachSlot].morph != null)
+                                    TMorph tgtMorphR = GetAttachMorph(iks.tgtMaidR, iks.tgtHandR_AttachSlot);
+                                    if (tgtMorphR != null)
                                     {
                                         Vector3 vector2;
                                         Quaternion rotation2;
-                                        iks.tgtMaidR.body0.goSlot[iks.tgtHandR_AttachSlot].morph
+                                        tgtMorphR
                                             .GetAttachPoint(iks.tgtHandR_AttachName, out vector2, out rotation2);
                                         if (p_mscfg.doIKTargetMHandSpCustom_v2 && !p_mscfg.doIK159NewPointToDef)
                                         {
@@ -3990,12 +4010,12 @@ namespace CM3D2.XtMasterSlave.Plugin
                             else if (p_mscfg.doIKTargetMHandSpCustom_v2) // v5.0
                             {
                                 var iks = slave.body0._ikp();
-                                if (iks.tgtMaidR != null && iks.tgtMaidR.body0 != null &&
-                                    iks.tgtMaidR.body0.goSlot[iks.tgtHandR_AttachSlot].morph != null)
+                                TMorph tgtMorphR = GetAttachMorph(iks.tgtMaidR, iks.tgtHandR_AttachSlot);
+                                if (tgtMorphR != null)
                                 {
                                     Vector3 vector;
                                     Quaternion rotation;
-                                    iks.tgtMaidR.body0.goSlot[iks.tgtHandR_AttachSlot].morph
+                                    tgtMorphR
                                         .GetAttachPoint(iks.tgtHandR_AttachName, out vector, out rotation);
 
                                     if (!p_mscfg.doIK159NewPointToDef)
@@ -4100,12 +4120,12 @@ namespace CM3D2.XtMasterSlave.Plugin
                                 //if (true/*iks.tgtHandL_AttachName != string.Empty && slave.body0.goSlot[iks.tgtHandL_AttachSlot].morph != null*/)
                                 if (iks != null && iks.tgtHandL_AttachSlot >= 0)
                                 {
-                                    if (iks.tgtMaidL != null && iks.tgtMaidL.body0 != null &&
-                                        iks.tgtMaidL.body0.goSlot[iks.tgtHandL_AttachSlot].morph != null)
+                                    TMorph tgtMorphL = GetAttachMorph(iks.tgtMaidL, iks.tgtHandL_AttachSlot);
+                                    if (tgtMorphL != null)
                                     {
                                         Vector3 vector;
                                         Quaternion rotation;
-                                        iks.tgtMaidL.body0.goSlot[iks.tgtHandL_AttachSlot].morph
+                                        tgtMorphL
                                             .GetAttachPoint(iks.tgtHandL_AttachName, out vector, out rotation);
                                         if (p_mscfg.doIKTargetMHandSpCustom_v2 && !p_mscfg.doIK159NewPointToDef)
                                         {
@@ -4148,12 +4168,12 @@ namespace CM3D2.XtMasterSlave.Plugin
                             else if (p_mscfg.doIKTargetMHandSpCustom_v2) // v5.0
                             {
                                 var iks = slave.body0._ikp();
-                                if (iks.tgtMaidL != null && iks.tgtMaidL.body0 != null &&
-                                    iks.tgtMaidL.body0.goSlot[iks.tgtHandL_AttachSlot].morph != null)
+                                TMorph tgtMorphL = GetAttachMorph(iks.tgtMaidL, iks.tgtHandL_AttachSlot);
+                                if (tgtMorphL != null)
                                 {
                                     Vector3 vector;
                                     Quaternion rotation;
-                                    iks.tgtMaidL.body0.goSlot[iks.tgtHandL_AttachSlot].morph
+                                    tgtMorphL
                                         .GetAttachPoint(iks.tgtHandL_AttachName, out vector, out rotation);
 
                                     if (!p_mscfg.doIK159NewPointToDef)
@@ -9085,7 +9105,15 @@ namespace CM3D2.XtMasterSlave.Plugin
             //_camera_num = Camera.allCamerasCount;
             foreach (var m in _MSlinks)
             {
-                m.lateUpdate();
+                // 1つのリンクで例外が出ても、他のリンクの処理を止めない
+                try
+                {
+                    m.lateUpdate();
+                }
+                catch (Exception e)
+                {
+                    LogLinkError("lateUpdate", e);
+                }
             }
 
             VertexMorph_FixBlendValues();
@@ -9093,17 +9121,36 @@ namespace CM3D2.XtMasterSlave.Plugin
             // 手のアタッチ角度調整
             foreach (var ms in _MSlinks)
             {
-                if (!IsHookActive)
-                    ms.lateHandsAtcpProc();
-                /*
+                try
+                {
+                    if (!IsHookActive)
+                        ms.lateHandsAtcpProc();
+                    /*
 #if DEBUG
-                if (ms.do_slave && Input.GetKey(KeyCode.Y))
-                    IkXT._inst.NewIKReset(ms.do_slave);
+                    if (ms.do_slave && Input.GetKey(KeyCode.Y))
+                        IkXT._inst.NewIKReset(ms.do_slave);
 #endif
 */
-                // 手指のブレンド v0030
-                ms.lateBlendHand();
+                    // 手指のブレンド v0030
+                    ms.lateBlendHand();
+                }
+                catch (Exception e)
+                {
+                    LogLinkError("lateHandsAtcpProc", e);
+                }
             }
+        }
+
+        static float lastLinkErrorLogTime = -100f;
+
+        // 例外を毎フレーム報告するとログ出力とフレームレートを食うので間引く
+        static void LogLinkError(string where, Exception e)
+        {
+            if (Time.realtimeSinceStartup - lastLinkErrorLogTime < 5f)
+                return;
+
+            lastLinkErrorLogTime = Time.realtimeSinceStartup;
+            UnityEngine.Debug.LogWarning("XtMS: " + where + " で例外を無視しました: " + e);
         }
 
         static bool IsHookActive = false;
