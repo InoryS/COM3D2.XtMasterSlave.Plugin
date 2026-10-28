@@ -1,4 +1,4 @@
-XtMasterSlave連携用APIメソッド 
+﻿XtMasterSlave連携用APIメソッド 
 
 ■履歴
 　0.0.2.5：新規実装

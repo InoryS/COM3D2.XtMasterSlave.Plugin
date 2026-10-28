@@ -1,4 +1,4 @@
-XtMasterSlave_Yotogi.iniの表情テーブルで設定可能な表情について。
+﻿XtMasterSlave_Yotogi.iniの表情テーブルで設定可能な表情について。
 立ち役のキャラクターによって変更したくなると思うので書いておきます。
 
 

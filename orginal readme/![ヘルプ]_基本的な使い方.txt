@@ -1,4 +1,4 @@
-■使い方
+﻿■使い方
 
 ・男性キャラとメイドキャラが、それぞれ一人以上表示されている状態でAlt＋Mキーを押す。
 　（キー設定はUnityInjector\ConfigフォルダのXtMasterSlave.iniで変更可能）
