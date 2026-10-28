@@ -11254,7 +11254,13 @@ namespace ExtensionMethods
                 }
                 else
                 {
+#if COM3D25_UNITY_2022
+                    // COM3D2.5 は IK 系統が全面的に作り直されており（IKCtrlData/IKMgrData 廃止）、
+                    // このアダプタは未対応。IK 連携だけを無効化し、他の機能はそのまま動かす。
+                    Console.WriteLine("XtMS: COM3D2.5 (3.x) を検出。手のIK連携は未対応のため無効化します");
+#else
                     Console.WriteLine("XtMS: 旧IKモードで動作開始(IKMgr v1.59未満)");
+#endif
 
                     _inst = new IkInst();
                 }
@@ -11493,64 +11499,68 @@ namespace ExtensionMethods
             object objR;
             FiHand fiR, fiL;
 
+            // 反射ハンドルが揃わない環境（COM3D2.5 3.x など）では全プロパティを無効化する。
+            // 3.x は IKCtrlData / IKMgrData / TBody.IkPointR を持たないため、ここが false になる。
+            bool valid;
+
             public Transform tgtHandR
             {
-                get { return (Transform)fiR.fiTgt.GetValue(objR); }
-                set { fiR.fiTgt.SetValue(objR, value); }
+                get { return valid ? (Transform)fiR.fiTgt.GetValue(objR) : null; }
+                set { if (valid) fiR.fiTgt.SetValue(objR, value); }
             }
 
             public Transform tgtHandL
             {
-                get { return (Transform)fiL.fiTgt.GetValue(objL); }
-                set { fiL.fiTgt.SetValue(objL, value); }
+                get { return valid ? (Transform)fiL.fiTgt.GetValue(objL) : null; }
+                set { if (valid) fiL.fiTgt.SetValue(objL, value); }
             }
 
             public Maid tgtMaidR
             {
-                get { return fiR.fiMaid.GetValue(objR) as Maid; }
-                set { fiR.fiMaid.SetValue(objR, value); }
+                get { return valid ? fiR.fiMaid.GetValue(objR) as Maid : null; }
+                set { if (valid) fiR.fiMaid.SetValue(objR, value); }
             }
 
             public Maid tgtMaidL
             {
-                get { return fiL.fiMaid.GetValue(objL) as Maid; }
-                set { fiL.fiMaid.SetValue(objL, value); }
+                get { return valid ? fiL.fiMaid.GetValue(objL) as Maid : null; }
+                set { if (valid) fiL.fiMaid.SetValue(objL, value); }
             }
 
             public Vector3 tgtHandR_offset
             {
-                get { return (Vector3)fiR.fiOffset.GetValue(objR); }
-                set { fiR.fiOffset.SetValue(objR, value); }
+                get { return valid ? (Vector3)fiR.fiOffset.GetValue(objR) : Vector3.zero; }
+                set { if (valid) fiR.fiOffset.SetValue(objR, value); }
             }
 
             public Vector3 tgtHandL_offset
             {
-                get { return (Vector3)fiL.fiOffset.GetValue(objL); }
-                set { fiL.fiOffset.SetValue(objL, value); }
+                get { return valid ? (Vector3)fiL.fiOffset.GetValue(objL) : Vector3.zero; }
+                set { if (valid) fiL.fiOffset.SetValue(objL, value); }
             }
 
             public int tgtHandR_AttachSlot
             {
-                get { return (int)fiR.fiAslot.GetValue(objR); }
-                set { fiR.fiAslot.SetValue(objR, value); }
+                get { return valid ? (int)fiR.fiAslot.GetValue(objR) : -1; }
+                set { if (valid) fiR.fiAslot.SetValue(objR, value); }
             }
 
             public int tgtHandL_AttachSlot
             {
-                get { return (int)fiL.fiAslot.GetValue(objL); }
-                set { fiL.fiAslot.SetValue(objL, value); }
+                get { return valid ? (int)fiL.fiAslot.GetValue(objL) : -1; }
+                set { if (valid) fiL.fiAslot.SetValue(objL, value); }
             }
 
             public string tgtHandR_AttachName
             {
-                get { return fiR.fiAname.GetValue(objR) as string; }
-                set { fiR.fiAname.SetValue(objR, value); }
+                get { return valid ? fiR.fiAname.GetValue(objR) as string : null; }
+                set { if (valid) fiR.fiAname.SetValue(objR, value); }
             }
 
             public string tgtHandL_AttachName
             {
-                get { return fiL.fiAname.GetValue(objL) as string; }
-                set { fiL.fiAname.SetValue(objL, value); }
+                get { return valid ? fiL.fiAname.GetValue(objL) as string : null; }
+                set { if (valid) fiL.fiAname.SetValue(objL, value); }
             }
 
             void Init()
@@ -11584,6 +11594,7 @@ namespace ExtensionMethods
 
                     fiR = _handNew;
                     fiL = _handNew;
+                    valid = objR != null && objL != null && fiR.fiTgt != null;
                 }
                 else if (boLegacy)
                 {
@@ -11591,13 +11602,22 @@ namespace ExtensionMethods
                     objL = body;
                     fiR = _handR;
                     fiL = _handL;
+                    // 3.x は TBody に tgtHandR/L が無いのでここで false になる
+                    valid = fiR.fiTgt != null && fiL.fiTgt != null;
                 }
                 else
                 {
+                    if (fiPointR == null || fiPointL == null)
+                    {
+                        valid = false;
+                        return;
+                    }
+
                     objR = fiPointR.GetValue(body);
                     objL = fiPointL.GetValue(body);
                     fiR = _handNew;
                     fiL = _handNew;
+                    valid = objR != null && objL != null && fiR.fiTgt != null;
                 }
             }
 
@@ -11699,7 +11719,9 @@ namespace ExtensionMethods
             if (IkXT.IsIkMgr159 || IkXT.IsIkCtrlO117)
             {
                 //fiVechand.SetValue(tb.IKHandR.IKCmo, v3);
-                fiVechand.SetValue(IkXT.GetIKCmo(tb, "右手"), v3);
+                object cmoR = IkXT.GetIKCmo(tb, "右手");
+                if (cmoR != null && fiVechand != null)
+                    fiVechand.SetValue(cmoR, v3);
                 return;
             }
 
@@ -11707,15 +11729,18 @@ namespace ExtensionMethods
             if (typeIKP != null)
             {
                 var objL = fiIkpointR.GetValue(tb);
-                //if (objL != null)
-                {
-                    ikm = fim_IkMgr.GetValue(objL);
-                }
+                if (objL == null)
+                    return;
+                ikm = fim_IkMgr.GetValue(objL);
             }
             else
                 ikm = typeof(TBody).InvokeMember("ikRightArm",
                     BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly,
                     null, tb, null);
+
+            // 3.x には ikRightArm / vechand が無いので何もしない
+            if (ikm == null || fiVechand == null)
+                return;
 
             fiVechand.SetValue(ikm, v3);
         }
@@ -11725,7 +11750,9 @@ namespace ExtensionMethods
             if (IkXT.IsIkMgr159 || IkXT.IsIkCtrlO117)
             {
                 //fiVechand.SetValue(tb.IKHandL.IKCmo, v3);
-                fiVechand.SetValue(IkXT.GetIKCmo(tb, "左手"), v3);
+                object cmoL = IkXT.GetIKCmo(tb, "左手");
+                if (cmoL != null && fiVechand != null)
+                    fiVechand.SetValue(cmoL, v3);
                 return;
             }
 
@@ -11733,15 +11760,18 @@ namespace ExtensionMethods
             if (typeIKP != null)
             {
                 var objL = fiIkpointL.GetValue(tb);
-                //if (objL != null)
-                {
-                    ikm = fim_IkMgr.GetValue(objL);
-                }
+                if (objL == null)
+                    return;
+                ikm = fim_IkMgr.GetValue(objL);
             }
             else
                 ikm = typeof(TBody).InvokeMember("ikLeftArm",
                     BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly,
                     null, tb, null);
+
+            // 3.x には ikLeftArm / vechand が無いので何もしない
+            if (ikm == null || fiVechand == null)
+                return;
 
             fiVechand.SetValue(ikm, v3);
         }
@@ -11757,6 +11787,9 @@ namespace ExtensionMethods
         public static void IKCmoProc(this TBody body, bool handRight, Transform bone, Vector3 tgt, Vector3 offset)
         {
             var cmo = IkXT.GetIKCmo(body, handRight ? "右手" : "左手");
+            if (cmo == null) // 3.x などハンドルが取れない環境では何もしない
+                return;
+
             var ikctrl = IkXT.GetIkPoint(body, handRight ? "右手" : "左手");
             switch (miIkcmoProc.GetParameters().Length)
             {
