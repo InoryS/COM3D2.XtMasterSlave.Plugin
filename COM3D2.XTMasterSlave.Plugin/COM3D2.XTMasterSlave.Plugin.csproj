@@ -1,17 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+<!--
+    双版本构建 / Dual-version build matrix
+
+      Debug / Release
+          -> COM3D2 (2.x, Unity 5.6, net35)
+          -> DefineConstants: COM3D2;COM3D2only
+          -> bin\Debug\net35\ / bin\Release\net35\
+      COM3D25_UNITY_2022-Debug / COM3D25_UNITY_2022-Release
+          -> COM3D2.5 (3.x, Unity 2022.3, net48)
+          -> DefineConstants: COM3D2;COM3D2only;COM3D25_UNITY_2022
+          -> bin\COM3D25_UNITY_2022-Debug\net48\ / ...-Release\net48\
+
+    用法 / Usage:
+      dotnet build -c Release
+      dotnet build -c COM3D25_UNITY_2022-Release
+-->
+
 <PropertyGroup>
-  <TargetFramework>net35</TargetFramework>
   <AssemblyName>COM3D2.XTMasterSlave.Plugin</AssemblyName>
-  <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   <LangVersion>latest</LangVersion>
+  <RootNamespace>COM3D2.XTMasterSlave.Plugin</RootNamespace>
+  <Configurations>Debug;Release;COM3D25_UNITY_2022-Debug;COM3D25_UNITY_2022-Release</Configurations>
   <RestoreAdditionalProjectSources>
     https://api.nuget.org/v3/index.json;
     https://nuget.bepinex.dev/v3/index.json;
     https://nuget.samboy.dev/v3/index.json
   </RestoreAdditionalProjectSources>
-  <RootNamespace>COM3D2.XTMasterSlave.Plugin</RootNamespace>
+</PropertyGroup>
+
+<!-- COM3D2 (2.x, Unity 5.6) -->
+<PropertyGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Release'">
+  <TargetFramework>net35</TargetFramework>
+  <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  <GameLibsVersion>2.43.1-r.0</GameLibsVersion>
+</PropertyGroup>
+
+<!-- COM3D2.5 (3.x, Unity 2022.3) -->
+<PropertyGroup Condition="'$(Configuration)' == 'COM3D25_UNITY_2022-Debug' Or '$(Configuration)' == 'COM3D25_UNITY_2022-Release'">
+  <TargetFramework>net48</TargetFramework>
+  <GameLibsVersion>3.46.1-r.0</GameLibsVersion>
+  <UnityModulesVersion>2022.3.35</UnityModulesVersion>
 </PropertyGroup>
 
 <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -31,18 +61,32 @@
   <ErrorReport>prompt</ErrorReport>
   <WarningLevel>4</WarningLevel>
 </PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'COM3D25_UNITY_2022-Debug|AnyCPU' ">
+  <DebugSymbols>true</DebugSymbols>
+  <DebugType>full</DebugType>
+  <Optimize>false</Optimize>
+  <OutputPath>bin\COM3D25_UNITY_2022-Debug\</OutputPath>
+  <DefineConstants>DEBUG;TRACE;COM3D2;COM3D2only;COM3D25_UNITY_2022</DefineConstants>
+  <ErrorReport>prompt</ErrorReport>
+  <WarningLevel>4</WarningLevel>
+</PropertyGroup>
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'COM3D25_UNITY_2022-Release|AnyCPU' ">
+  <DebugType>pdbonly</DebugType>
+  <Optimize>true</Optimize>
+  <OutputPath>bin\COM3D25_UNITY_2022-Release\</OutputPath>
+  <DefineConstants>TRACE;COM3D2;COM3D2only;COM3D25_UNITY_2022</DefineConstants>
+  <ErrorReport>prompt</ErrorReport>
+  <WarningLevel>4</WarningLevel>
+</PropertyGroup>
 
 
 <ItemGroup>
-  <PackageReference Include="COM3D2.GameLibs" Version="2.43.1-r.0" />
+  <PackageReference Include="COM3D2.GameLibs" Version="$(GameLibsVersion)" />
   <Reference Include="JsonFx.Json">
     <HintPath>..\libs\JsonFx.Json.dll</HintPath>
   </Reference>
   <Reference Include="PluginExt">
     <HintPath>..\libs\PluginExt.dll</HintPath>
-  </Reference>
-  <Reference Include="UnityEngine">
-    <HintPath>..\libs\UnityEngine.dll</HintPath>
   </Reference>
   <Reference Include="UnityInjector">
     <HintPath>..\libs\UnityInjector.dll</HintPath>
@@ -54,6 +98,16 @@
   <Reference Include="System.Windows.Forms" />
   <Reference Include="System.Xml" />
   <Reference Include="System.Xml.Linq" />
+</ItemGroup>
+
+<!-- UnityEngine：2.x 是单体 UnityEngine.dll，3.x 起 Unity 拆成模块化程序集 -->
+<ItemGroup Condition="'$(UnityModulesVersion)' == ''">
+  <Reference Include="UnityEngine">
+    <HintPath>..\libs\UnityEngine.dll</HintPath>
+  </Reference>
+</ItemGroup>
+<ItemGroup Condition="'$(UnityModulesVersion)' != ''">
+  <PackageReference Include="UnityEngine.Modules" IncludeAssets="compile" Version="$(UnityModulesVersion)" />
 </ItemGroup>
 
 <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">

@@ -11042,6 +11042,10 @@ namespace ExtensionMethods
 
         static void IKTargetClearOld(this Maid m)
         {
+#if COM3D25_UNITY_2022
+            // COM3D2.5 では Maid.IKTargetToAttachPoint が廃止され、IK は常に新方式になる。
+            // IKTargetClear() 側で IkXT.IsNewIK が必ず true になるため、この経路は通らない。
+#else
             m.IKTargetToAttachPoint("左手", null, "body", string.Empty, Vector3.zero);
             m.IKTargetToAttachPoint("右手", null, "body", string.Empty, Vector3.zero);
             // 155
@@ -11052,6 +11056,7 @@ namespace ExtensionMethods
             // public void IKAttach(string ik_name, IKAttachParam param)
             //?
             // m.body0.fullBodyIK.IKAttach(ik_name, ikattachParam);
+#endif
         }
 
         static Assembly LoadIkDll(string dllname)
