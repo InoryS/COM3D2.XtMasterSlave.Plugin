@@ -11190,16 +11190,26 @@ namespace ExtensionMethods
             {
                 get
                 {
+#if COM3D25_UNITY_2022
+                    // 3.x は IKCtrlData / IKMgrData が無いが、IkInst25 が AIKCtrl 経由で処理する
+                    return true;
+#else
                     var result = IsIkCtrlO117 || IsIkMgr159;
 #if DEBUG_VERSION
 					Console.WriteLine($"[XTMS]  IsNewIK result: {result}");
 #endif
                     return result;
+#endif
                 }
             }
 
             static IkXT()
             {
+#if COM3D25_UNITY_2022
+                // 3.x は IKCtrlData / IKMgrData が無いので、AIKCtrl ベースの実装を直接使う
+                Console.WriteLine("XtMS: COM3D2.5 (3.x) の IK で動作開始");
+                _inst = new IkInst25();
+#else
 #if false //COM3D2 //com117以降で無理に
 				_inst = new XtMasterSlave_IK159.Ik159Inst();
 #else
@@ -11254,16 +11264,11 @@ namespace ExtensionMethods
                 }
                 else
                 {
-#if COM3D25_UNITY_2022
-                    // COM3D2.5 は IK 系統が全面的に作り直されており（IKCtrlData/IKMgrData 廃止）、
-                    // このアダプタは未対応。IK 連携だけを無効化し、他の機能はそのまま動かす。
-                    Console.WriteLine("XtMS: COM3D2.5 (3.x) を検出。手のIK連携は未対応のため無効化します");
-#else
                     Console.WriteLine("XtMS: 旧IKモードで動作開始(IKMgr v1.59未満)");
-#endif
 
                     _inst = new IkInst();
                 }
+#endif
 #endif
             }
 
@@ -11392,12 +11397,230 @@ namespace ExtensionMethods
             }
         }
 
+#if COM3D25_UNITY_2022
+        /// <summary>
+        ///     COM3D2.5 (3.x) 用の IK 実装。
+        ///
+        ///     3.x は IKCtrlData / IKMgrData / FullBodyIKCtrl を廃止し、
+        ///     TBody.fullBodyIK (FullBodyIKMgr) と AIKCtrl に置き換えている。
+        ///     ありがたいことに AIKCtrl.IKTargetData のフィールド構成は 2.x の
+        ///     IKCtrlData.IKTargetData とほぼ同じ（先頭が小文字になっただけ）なので、
+        ///     2.x 側のロジックをそのまま移植できる。
+        ///
+        ///     target / targetChara / tgtAttachSlot / tgtAttachName / tgtOffset
+        ///       ← 2.x の Target / TgtChara / Tgt_AttachSlot / Tgt_AttachName / TgtOffset
+        ///
+        ///     未対応: GetIKCmo()。3.x の AIKCtrl には vechand 相当が無いため null を返し、
+        ///     呼び出し側（setR_vechand / setL_vechand）は no-op になる。
+        /// </summary>
+        public class IkInst25 : IkInst
+        {
+            static readonly string[] HandNames = { "右手", "左手" };
+
+            static readonly AIKCtrl.IKAttachType[] AttachTypes =
+            {
+                AIKCtrl.IKAttachType.NewPoint,
+                AIKCtrl.IKAttachType.Rotate,
+            };
+
+            static AIKCtrl GetCtrl(TBody body, string hand)
+            {
+                if (!body || !body.fullBodyIK)
+                    return null;
+                return body.fullBodyIK.GetIKCtrl(hand);
+            }
+
+            static AIKCtrl.IKSettingData GetSetting(AIKCtrl ctrl, AIKCtrl.IKAttachType type)
+            {
+                return ctrl != null ? ctrl.GetIKSettingData(type) : null;
+            }
+
+            static float FixAngle(float angle)
+            {
+                while (Mathf.Abs(angle) > 360f)
+                    angle = angle < 0f ? angle + 360f : angle - 360f;
+                return angle;
+            }
+
+            public override bool IsNewPointIK(Maid m, string hand = "右手")
+            {
+                AIKCtrl ctrl = GetCtrl(m != null ? m.body0 : null, hand);
+                AIKCtrl.IKSettingData data = GetSetting(ctrl, AIKCtrl.IKAttachType.NewPoint);
+                return data != null && data.curTargetData != null && data.curTargetData.isTgtAttachPoint;
+            }
+
+            public override object GetIkPoint(TBody body, string hand = "右手")
+            {
+                AIKCtrl.IKSettingData data = GetSetting(GetCtrl(body, hand), AIKCtrl.IKAttachType.NewPoint);
+                return data != null ? data.curTargetData : null;
+            }
+
+            public override object GetIkCtrl(Maid maid)
+            {
+                return maid != null && maid.body0 ? maid.body0.fullBodyIK : null;
+            }
+
+            public override object GetIkCtrlPoint(TBody body, string hand = "右手")
+            {
+                return GetSetting(GetCtrl(body, hand), AIKCtrl.IKAttachType.NewPoint);
+            }
+
+            public override void IkClear(Maid tgt, XtMasterSlave.MsLinkConfig mscfg)
+            {
+                IkClear(tgt, new List<string>(HandNames), mscfg);
+            }
+
+            public override void IkClear(Maid tgt, List<string> listHand, XtMasterSlave.MsLinkConfig mscfg,
+                int IkType = (-1))
+            {
+                if (tgt == null || !tgt.body0 || listHand == null)
+                    return;
+
+                foreach (string hand in listHand)
+                {
+                    AIKCtrl ctrl = GetCtrl(tgt.body0, hand);
+                    if (ctrl != null)
+                        ctrl.Detach(0f);
+                }
+            }
+
+            public override void CopyHandIK(Maid master, Maid slave, XtMasterSlave.v3Offsets[] v3ofs, int num_)
+            {
+                if (master == null || slave == null || !master.body0 || !slave.body0)
+                    return;
+
+                foreach (string hand in HandNames)
+                {
+                    AIKCtrl cm = GetCtrl(master.body0, hand);
+                    AIKCtrl cs = GetCtrl(slave.body0, hand);
+                    if (cm == null || cs == null)
+                        continue;
+
+                    foreach (AIKCtrl.IKAttachType type in AttachTypes)
+                    {
+                        AIKCtrl.IKSettingData im = GetSetting(cm, type);
+                        AIKCtrl.IKSettingData isd = GetSetting(cs, type);
+                        if (im == null || isd == null || im.curTargetData == null || isd.curTargetData == null)
+                            continue;
+
+                        AIKCtrl.IKTargetData tm = im.curTargetData;
+                        AIKCtrl.IKTargetData ts = isd.curTargetData;
+
+                        if (string.IsNullOrEmpty(tm.tgtAttachName) && tm.target == null)
+                            continue;
+
+                        var param = new kt.ik.IKAttachParam(slave, tm.targetChara)
+                        {
+                            attachType = im.attachType,
+                            execTiming = AIKCtrl.IKExecTiming.Normal,
+                            attachTarget = tm.target,
+                            attachPointName = tm.tgtAttachName,
+                            offset = tm.tgtOffset,
+                            doAnimation = false,
+                        };
+                        cs.SetIKSetting(param);
+                        ts.tgtAttachSlot = tm.tgtAttachSlot;
+
+                        if (isd.isPointAttach)
+                        {
+                            ts.tgtOffset += hand == "右手"
+                                ? v3ofs[num_].v3HandROffset
+                                : v3ofs[num_].v3HandLOffset;
+                        }
+                        else
+                        {
+                            Vector3 rot = hand == "右手"
+                                ? v3ofs[num_].v3HandROffsetRot
+                                : v3ofs[num_].v3HandLOffsetRot;
+
+                            ts.tgtOffset.x = FixAngle(ts.tgtOffset.x + rot.x);
+                            ts.tgtOffset.y = FixAngle(ts.tgtOffset.y + rot.y);
+                            ts.tgtOffset.z = FixAngle(ts.tgtOffset.z + rot.z);
+                        }
+                    }
+                }
+            }
+
+            public override void SetHandIKRotate(string handName, Maid master, Maid slave, string boneTgtname,
+                Vector3 v3HandLOffsetRot)
+            {
+                AIKCtrl ctrl = GetCtrl(slave != null ? slave.body0 : null, handName);
+                if (ctrl == null)
+                    return;
+
+                Transform axis = null;
+                if (master != null && master.body0 && !string.IsNullOrEmpty(boneTgtname))
+                    axis = master.body0.GetBone(boneTgtname);
+
+                var param = new kt.ik.IKAttachParam(slave, master)
+                {
+                    attachType = AIKCtrl.IKAttachType.Rotate,
+                    execTiming = AIKCtrl.IKExecTiming.Normal,
+                    axisBone = axis,
+                    offset = v3HandLOffsetRot,
+                    doAnimation = false,
+                };
+                ctrl.SetIKSetting(param);
+            }
+
+            public override object GetIKCmo(TBody body, string hand = "右手")
+            {
+                // 3.x の AIKCtrl に vechand 相当が無いため未対応
+                return null;
+            }
+
+            public override void SetHandIKTarget(XtMasterSlave.MsLinkConfig mscfg, string handName, Maid master,
+                Maid slave, int slot_no, string attach_name, Transform target, Vector3 v3HandLOffset)
+            {
+                AIKCtrl ctrl = GetCtrl(slave != null ? slave.body0 : null, handName);
+                if (ctrl == null)
+                    return;
+
+                AIKCtrl.IKAttachType type = mscfg != null && mscfg.doIK159NewPointToDef
+                    ? AIKCtrl.IKAttachType.NewPoint
+                    : AIKCtrl.IKAttachType.Point;
+
+                var param = new kt.ik.IKAttachParam(slave, master)
+                {
+                    attachType = type,
+                    execTiming = AIKCtrl.IKExecTiming.Normal,
+                    attachTarget = target,
+                    attachPointName = attach_name ?? string.Empty,
+                    offset = v3HandLOffset,
+                    doAnimation = false,
+                };
+                ctrl.SetIKSetting(param);
+
+                // IKAttachParam.slotNo は slotName から導出される読み取り専用プロパティなので、
+                // 数値で受け取った slot_no は設定後に直接書き込む
+                AIKCtrl.IKSettingData data = GetSetting(ctrl, type);
+                if (data != null && data.curTargetData != null)
+                    data.curTargetData.tgtAttachSlot = slot_no;
+            }
+        }
+#endif
+
         static void SetFI()
         {
             fiPointL = typeof(TBody).GetField("IkPointL",
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
             fiPointR = typeof(TBody).GetField("IkPointR",
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+#if COM3D25_UNITY_2022
+            // COM3D2.5: AIKCtrl.IKTargetData は 2.x の IKCtrlData.IKTargetData と同じ構成で、
+            // フィールド名だけ先頭が小文字になっている
+            {
+                Console.WriteLine("XtMS: COM3D2.5 (3.x) の IK を検出");
+                Type typTgt = typeof(AIKCtrl.IKTargetData);
+                _handNew.fiTgt = typTgt.GetField("target", BindingFlags.Instance | BindingFlags.Public);
+                _handNew.fiMaid = typTgt.GetField("targetChara", BindingFlags.Instance | BindingFlags.Public);
+                _handNew.fiAslot = typTgt.GetField("tgtAttachSlot", BindingFlags.Instance | BindingFlags.Public);
+                _handNew.fiAname = typTgt.GetField("tgtAttachName", BindingFlags.Instance | BindingFlags.Public);
+                _handNew.fiOffset = typTgt.GetField("tgtOffset", BindingFlags.Instance | BindingFlags.Public);
+                return;
+            }
+#endif
 
             if (IkXT.IsIkCtrlO132)
             {
@@ -11571,7 +11794,8 @@ namespace ExtensionMethods
                     NeedInit = false;
                 }
 
-                if (IkXT.IsIkMgr159 || IkXT.IsIkCtrlO117)
+                // IsNewIK は 3.x では常に true（IkInst25 が処理する）
+                if (IkXT.IsNewIK)
                 {
                     /*
                     objR = body.StrIKDataPair["右手"].GetIKParam(IKMgrData.IKAttachType.Point);
