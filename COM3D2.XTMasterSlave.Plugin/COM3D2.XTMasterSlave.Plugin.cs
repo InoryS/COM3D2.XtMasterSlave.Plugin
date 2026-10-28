@@ -2260,12 +2260,12 @@ namespace CM3D2.XtMasterSlave.Plugin
         // ExPluginBase (Copyright (c) 2015 asm__) より改造
         public T ReadConfig<T>(string section, string dirPath) where T : new()
         {
-            return SharedConfig.ReadConfig<T>("Config", Path.Combine(dirPath, GetType().Name + ".ini"));
+            return XtIni.ReadConfig<T>("Config", Path.Combine(dirPath, GetType().Name + ".ini"));
         }
 
         public void SaveConfig<T>(T data, string section, string dirPath)
         {
-            SharedConfig.SaveConfig("Config", Path.Combine(dirPath, GetType().Name + ".ini"), data);
+            XtIni.SaveConfig("Config", Path.Combine(dirPath, GetType().Name + ".ini"), data);
         }
 
         #endregion
@@ -2297,7 +2297,7 @@ namespace CM3D2.XtMasterSlave.Plugin
                 if (i == 0)
                     cfgs[i] = ReadConfig<MsLinkConfig>("Config", pathConfig(""));
                 else
-                    cfgs[i] = SharedConfig.ReadConfig<MsLinkConfig>("Config-" + (i + 1).ToString(),
+                    cfgs[i] = XtIni.ReadConfig<MsLinkConfig>("Config-" + (i + 1).ToString(),
                         pathConfig(PluginCfgFN));
             }
 
@@ -2306,15 +2306,15 @@ namespace CM3D2.XtMasterSlave.Plugin
                 IniCfgsTov3Offsets(ref v3ofs[i], cfgs[i]);
             }
 
-            ycfg = PluginExt.SharedConfig.ReadConfig<YotogiConfig>("Config", pathConfig(YotogiCfgFN));
+            ycfg = XtIni.ReadConfig<YotogiConfig>("Config", pathConfig(YotogiCfgFN));
             VYMModule.VymModule.cfg =
-                PluginExt.SharedConfig.ReadConfig<VYMModule.VymModule.VibeYourMaidConfig>("VYMAsset",
+                XtIni.ReadConfig<VYMModule.VymModule.VibeYourMaidConfig>("VYMAsset",
                     pathConfig(YotogiCfgFN));
 
             // v0027
             // ボイステーブルをini→CSVに
             VymModule.voiceLegacy =
-                SharedConfig.ReadConfig<VymModule.VoiceTableLegacy>("VYMAsset", pathConfig(YotogiCfgFN));
+                XtIni.ReadConfig<VymModule.VoiceTableLegacy>("VYMAsset", pathConfig(YotogiCfgFN));
             cnv2csv.SaveVoiceCsvFile();
             // CSVロード
             NewVoiceTable.LoadCsv();
@@ -2345,10 +2345,10 @@ namespace CM3D2.XtMasterSlave.Plugin
             SaveConfig(cfg, "Config", pathConfig(""));
             SaveConfig(cfgs[0], "Config", pathConfig(""));
             for (int i = 1; i < cfgs.Length; i++)
-                SharedConfig.SaveConfig("Config-" + (i + 1).ToString(), pathConfig(PluginCfgFN), cfgs[i]);
+                XtIni.SaveConfig("Config-" + (i + 1).ToString(), pathConfig(PluginCfgFN), cfgs[i]);
 
-            PluginExt.SharedConfig.SaveConfig("Config", pathConfig(YotogiCfgFN), ycfg);
-            PluginExt.SharedConfig.SaveConfig("VYMAsset", pathConfig(YotogiCfgFN), VYMModule.VymModule.cfg);
+            XtIni.SaveConfig("Config", pathConfig(YotogiCfgFN), ycfg);
+            XtIni.SaveConfig("VYMAsset", pathConfig(YotogiCfgFN), VYMModule.VymModule.cfg);
         }
 
         public static void v3OffsetsToIniCfgs(ref MsLinkConfig cfgs, v3Offsets v3ofs)

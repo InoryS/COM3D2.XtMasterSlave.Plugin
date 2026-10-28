@@ -639,7 +639,7 @@ namespace CM3D2.XtMasterSlave.Plugin
                 string xfn = extpath(fileIni);
                 Console.WriteLine("ユーザーセーブini設定読み込み :" + xfn);
 
-                var tmpc = PluginExt.SharedConfig.ReadConfig<UserConfigHeader>("Config", xfn);
+                var tmpc = XtIni.ReadConfig<UserConfigHeader>("Config", xfn);
                 //isExist = true;
 
                 tmpc.Memo = tmpc.Memo.Replace("＜改行＞", "\r\n");
@@ -668,13 +668,13 @@ namespace CM3D2.XtMasterSlave.Plugin
                 Console.WriteLine("ユーザーセーブini設定読み込み :" + xfn);
 
                 UserConfig uc = new UserConfig();
-                uc.cfg_h = SharedConfig.ReadConfig<UserConfigHeader>("Config", xfn);
+                uc.cfg_h = XtIni.ReadConfig<UserConfigHeader>("Config", xfn);
                 uc.cfg_h.Memo = uc.cfg_h.Memo.Replace("＜改行＞", "\r\n");
                 //tmpc.Memo = tmpc.Memo.Replace("＜改行＞", "\n");
 
                 for (int i = 0; i<XtMasterSlave.MAX_PAGENUM; i++)
                 {
-                    uc.cfgs_p[i] = SharedConfig.ReadConfig<UserConfigPage>("Page-" + (i+1).ToString(), xfn);
+                    uc.cfgs_p[i] = XtIni.ReadConfig<UserConfigPage>("Page-" + (i+1).ToString(), xfn);
 
                     //debugPrintConsole(uc.cfgs_p[i].Master_Name);
 
@@ -685,7 +685,7 @@ namespace CM3D2.XtMasterSlave.Plugin
                 //isExist = true;
 
                 for (int i = 0; i < uc.cfgs_ms.Length; i++)
-                    uc.cfgs_ms[i] = SharedConfig.ReadConfig<XtMasterSlave.MsLinkConfig>("Config-" + (i + 1).ToString(), xfn);
+                    uc.cfgs_ms[i] = XtIni.ReadConfig<XtMasterSlave.MsLinkConfig>("Config-" + (i + 1).ToString(), xfn);
                 /*
                 for (int i = 0; i < cfgs.Length; i++)
                 {
@@ -718,17 +718,17 @@ namespace CM3D2.XtMasterSlave.Plugin
                 Console.WriteLine("ユーザーセーブini設定読み込み :" + xfn);
 
                 UserConfig uc = new UserConfig();
-                uc.cfg_h = SharedConfig.ReadConfig<UserConfigHeader>("Config", xfn);
+                uc.cfg_h = XtIni.ReadConfig<UserConfigHeader>("Config", xfn);
                 uc.cfg_h.Memo = uc.cfg_h.Memo.Replace("＜改行＞", "\r\n");
                 //tmpc.Memo = tmpc.Memo.Replace("＜改行＞", "\n");
 
                 for (int i = 0; i < XtMasterSlave.MAX_PAGENUM; i++)
                 {
-                    uc.cfgs_p[i] = SharedConfig.ReadConfig<UserConfigPage>("Page-" + (i + 1).ToString(), xfn);
+                    uc.cfgs_p[i] = XtIni.ReadConfig<UserConfigPage>("Page-" + (i + 1).ToString(), xfn);
                 }
 
                 for (int i = 0; i < uc.cfgs_ms.Length; i++)
-                    SharedConfig.SaveConfig("Config-" + (i + 1).ToString(), xfn, uc.cfgs_ms[i]);
+                    XtIni.SaveConfig("Config-" + (i + 1).ToString(), xfn, uc.cfgs_ms[i]);
                 /*
                 for (int i = 0; i < cfgs.Length; i++)
                 {
@@ -790,7 +790,7 @@ namespace CM3D2.XtMasterSlave.Plugin
 
                     uc.cfg_h.Memo = uc.cfg_h.Memo.Replace("\n", "＜改行＞");
                     uc.cfg_h.Memo = uc.cfg_h.Memo.Replace("\r", "");
-                    SharedConfig.SaveConfig("Config", xfn, uc.cfg_h);
+                    XtIni.SaveConfig("Config", xfn, uc.cfg_h);
 
                     for (int i = 0; i < XtMasterSlave.MAX_PAGENUM; i++)
                     {
@@ -798,11 +798,11 @@ namespace CM3D2.XtMasterSlave.Plugin
                         uc.cfgs_p[i].Master_Name = uc.cfgs_p[i].Master_Name.dq_();
                         uc.cfgs_p[i].Slave_Name = uc.cfgs_p[i].Slave_Name.dq_();
 
-                        SharedConfig.SaveConfig("Page-" + (i + 1).ToString(), xfn, uc.cfgs_p[i]);
+                        XtIni.SaveConfig("Page-" + (i + 1).ToString(), xfn, uc.cfgs_p[i]);
                     }
 
                     for (int i = 0; i < uc.cfgs_ms.Length; i++)
-                        SharedConfig.SaveConfig("Config-" + (i + 1).ToString(), xfn, uc.cfgs_ms[i]);
+                        XtIni.SaveConfig("Config-" + (i + 1).ToString(), xfn, uc.cfgs_ms[i]);
                 }
                 if (strfn_d != null && File.Exists(strfn_d))
                 {
