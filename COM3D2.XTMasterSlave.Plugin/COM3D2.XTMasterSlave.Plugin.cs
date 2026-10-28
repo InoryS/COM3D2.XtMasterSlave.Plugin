@@ -3512,7 +3512,7 @@ namespace CM3D2.XtMasterSlave.Plugin
                         IkXT.IkClear(slave, new List<string> { "右手" }, p_mscfg /*null, Ik159.GetDefType(p_mscfg)*/);
 
                     Maid tgt = GetHandAtcTgt(true, slave, master, p_mscfg);
-                    AtccHand1R(slave, tgt, p_mscfg.doIKTargetMHandSpR_TgtBone, p_v3of2.v3HandROffset);
+                    AtccHand1R(slave, tgt, p_mscfg.doIKTargetMHandSpR_TgtBone, p_v3of2.v3HandROffset, p_mscfg);
                 }
 
                 if (p_mscfg.doIKTargetMHandSpL_TgtChar != ATgtChar.None)
@@ -3521,7 +3521,7 @@ namespace CM3D2.XtMasterSlave.Plugin
                         IkXT.IkClear(slave, new List<string> { "左手" }, p_mscfg /*null, Ik159.GetDefType(p_mscfg)*/);
 
                     Maid tgt = GetHandAtcTgt(false, slave, master, p_mscfg);
-                    AtccHand1L(slave, tgt, p_mscfg.doIKTargetMHandSpL_TgtBone, p_v3of2.v3HandLOffset);
+                    AtccHand1L(slave, tgt, p_mscfg.doIKTargetMHandSpL_TgtBone, p_v3of2.v3HandLOffset, p_mscfg);
                 }
             }
 
@@ -9421,16 +9421,18 @@ namespace CM3D2.XtMasterSlave.Plugin
             Transform tgt = BoneLink.BoneLink.SearchObjName(master.body0.m_Bones.transform, bone_handR, true);
             if (tgt)
             {
-                slave.body0._ikp().tgtMaidR = master;
-                slave.body0._ikp().tgtHandR_AttachSlot = (int)TBody.SlotID.body;
-                slave.body0._ikp().tgtHandR_AttachName = string.Empty;
-                slave.body0._ikp().tgtHandR = tgt;
-                slave.body0._ikp().tgtHandR_offset = v3HandROffset; //Vector3.zero;
-
-                if (IkXT.IsIkCtrlO117)
+                if (IkXT.IsNewIK)
                 {
                     IkXT.SetHandIKTarget(mscfg, "右手", master, slave, (int)TBody.SlotID.body, string.Empty, tgt,
                         v3HandROffset);
+                }
+                else
+                {
+                    slave.body0._ikp().tgtMaidR = master;
+                    slave.body0._ikp().tgtHandR_AttachSlot = (int)TBody.SlotID.body;
+                    slave.body0._ikp().tgtHandR_AttachName = string.Empty;
+                    slave.body0._ikp().tgtHandR = tgt;
+                    slave.body0._ikp().tgtHandR_offset = v3HandROffset;
                 }
 
                 if (!mscfg.doIK159NewPointToDef && mscfg.doIK159RotateToHands)
@@ -9517,16 +9519,18 @@ namespace CM3D2.XtMasterSlave.Plugin
             Transform tgt = BoneLink.BoneLink.SearchObjName(master.body0.m_Bones.transform, bone_handL, true);
             if (tgt)
             {
-                slave.body0._ikp().tgtMaidL = master;
-                slave.body0._ikp().tgtHandL_AttachSlot = (int)TBody.SlotID.body;
-                slave.body0._ikp().tgtHandL_AttachName = string.Empty;
-                slave.body0._ikp().tgtHandL = tgt;
-                slave.body0._ikp().tgtHandL_offset = v3HandLOffset; //Vector3.zero;
-
-                if (IkXT.IsIkCtrlO117)
+                if (IkXT.IsNewIK)
                 {
                     IkXT.SetHandIKTarget(mscfg, "左手", master, slave, (int)TBody.SlotID.body, string.Empty, tgt,
                         v3HandLOffset);
+                }
+                else
+                {
+                    slave.body0._ikp().tgtMaidL = master;
+                    slave.body0._ikp().tgtHandL_AttachSlot = (int)TBody.SlotID.body;
+                    slave.body0._ikp().tgtHandL_AttachName = string.Empty;
+                    slave.body0._ikp().tgtHandL = tgt;
+                    slave.body0._ikp().tgtHandL_offset = v3HandLOffset;
                 }
 
                 if (!mscfg.doIK159NewPointToDef && mscfg.doIK159RotateToHands)
@@ -9611,7 +9615,8 @@ namespace CM3D2.XtMasterSlave.Plugin
             }
         }
 
-        static void AtccHand1R(Maid slave, Maid tgtm, string atcpTgt, Vector3 v3HandOffset)
+        static void AtccHand1R(Maid slave, Maid tgtm, string atcpTgt, Vector3 v3HandOffset,
+            MsLinkConfig mscfg = null)
         {
             //Maid.IKTargetToAttachPointより
             int slotid = (int)TBody.SlotID.body;
@@ -9625,11 +9630,15 @@ namespace CM3D2.XtMasterSlave.Plugin
                     var bonetgt = BoneLink.BoneLink.SearchObjName(tgtm.body0.m_Bones.transform,
                         atcpTgt.Remove(0, Defines.data.comboBonePrefix.Length), true);
 
+#if COM3D25_UNITY_2022
+                    IkXT.SetHandIKTarget(mscfg, "右手", tgtm, slave, -1, string.Empty, bonetgt, v3HandOffset);
+#else
                     slave.body0._ikp().tgtMaidR = tgtm;
                     slave.body0._ikp().tgtHandR_AttachSlot = -1;
                     slave.body0._ikp().tgtHandR_AttachName = string.Empty;
                     slave.body0._ikp().tgtHandR = bonetgt;
                     slave.body0._ikp().tgtHandR_offset = v3HandOffset; //Vector3.zero;
+#endif
                     return;
                 }
 
@@ -9648,14 +9657,19 @@ namespace CM3D2.XtMasterSlave.Plugin
                 }
             }
 
+#if COM3D25_UNITY_2022
+            IkXT.SetHandIKTarget(mscfg, "右手", tgtm, slave, slotid, atcpName, null, v3HandOffset);
+#else
             slave.body0._ikp().tgtMaidR = tgtm ? tgtm : null;
             slave.body0._ikp().tgtHandR_AttachSlot = slotid;
             slave.body0._ikp().tgtHandR_AttachName = atcpName;
             slave.body0._ikp().tgtHandR = null;
             slave.body0._ikp().tgtHandR_offset = v3HandOffset; //Vector3.zero;
+#endif
         }
 
-        static void AtccHand1L(Maid slave, Maid tgtm, string atcpTgt, Vector3 v3HandLOffset)
+        static void AtccHand1L(Maid slave, Maid tgtm, string atcpTgt, Vector3 v3HandLOffset,
+            MsLinkConfig mscfg = null)
         {
             //Maid.IKTargetToAttachPointより
             int slotid = (int)TBody.SlotID.body;
@@ -9669,11 +9683,15 @@ namespace CM3D2.XtMasterSlave.Plugin
                     var bonetgt = BoneLink.BoneLink.SearchObjName(tgtm.body0.m_Bones.transform,
                         atcpTgt.Remove(0, Defines.data.comboBonePrefix.Length), true);
 
+#if COM3D25_UNITY_2022
+                    IkXT.SetHandIKTarget(mscfg, "左手", tgtm, slave, -1, string.Empty, bonetgt, v3HandLOffset);
+#else
                     slave.body0._ikp().tgtMaidL = tgtm;
                     slave.body0._ikp().tgtHandL_AttachSlot = -1;
                     slave.body0._ikp().tgtHandL_AttachName = string.Empty;
                     slave.body0._ikp().tgtHandL = bonetgt;
                     slave.body0._ikp().tgtHandL_offset = v3HandLOffset; //Vector3.zero;
+#endif
                     return;
                 }
 
@@ -9692,11 +9710,15 @@ namespace CM3D2.XtMasterSlave.Plugin
                 }
             }
 
+#if COM3D25_UNITY_2022
+            IkXT.SetHandIKTarget(mscfg, "左手", tgtm, slave, slotid, atcpName, null, v3HandLOffset);
+#else
             slave.body0._ikp().tgtMaidL = tgtm ? tgtm : null;
             slave.body0._ikp().tgtHandL_AttachSlot = slotid;
             slave.body0._ikp().tgtHandL_AttachName = atcpName;
             slave.body0._ikp().tgtHandL = null;
             slave.body0._ikp().tgtHandL_offset = v3HandLOffset; //Vector3.zero;
+#endif
         }
 
         static void AtccHandR(Maid slave, Maid tgtm, string boneName, Vector3 v3HandLOffset)
@@ -11403,13 +11425,6 @@ namespace ExtensionMethods
         ///
         ///     3.x は IKCtrlData / IKMgrData / FullBodyIKCtrl を廃止し、
         ///     TBody.fullBodyIK (FullBodyIKMgr) と AIKCtrl に置き換えている。
-        ///     ありがたいことに AIKCtrl.IKTargetData のフィールド構成は 2.x の
-        ///     IKCtrlData.IKTargetData とほぼ同じ（先頭が小文字になっただけ）なので、
-        ///     2.x 側のロジックをそのまま移植できる。
-        ///
-        ///     target / targetChara / tgtAttachSlot / tgtAttachName / tgtOffset
-        ///       ← 2.x の Target / TgtChara / Tgt_AttachSlot / Tgt_AttachName / TgtOffset
-        ///
         ///     未対応: GetIKCmo()。3.x の AIKCtrl には vechand 相当が無いため null を返し、
         ///     呼び出し側（setR_vechand / setL_vechand）は no-op になる。
         /// </summary>
@@ -11446,7 +11461,7 @@ namespace ExtensionMethods
             {
                 AIKCtrl ctrl = GetCtrl(m != null ? m.body0 : null, hand);
                 AIKCtrl.IKSettingData data = GetSetting(ctrl, AIKCtrl.IKAttachType.NewPoint);
-                return data != null && data.curTargetData != null && data.curTargetData.isTgtAttachPoint;
+                return data != null && data.attachType == AIKCtrl.IKAttachType.NewPoint;
             }
 
             public override object GetIkPoint(TBody body, string hand = "右手")
@@ -11479,8 +11494,17 @@ namespace ExtensionMethods
                 foreach (string hand in listHand)
                 {
                     AIKCtrl ctrl = GetCtrl(tgt.body0, hand);
-                    if (ctrl != null)
-                        ctrl.Detach(0f);
+                    if (ctrl == null)
+                        continue;
+
+                    ctrl.Detach(0f);
+                    AIKCtrl.IKSettingData data = GetSetting(ctrl, AIKCtrl.IKAttachType.NewPoint);
+                    if (IkType == (int)AIKCtrl.IKAttachType.Point || IkType == (int)AIKCtrl.IKAttachType.NewPoint)
+                        data.attachType = (AIKCtrl.IKAttachType)IkType;
+                    else if (mscfg != null)
+                        data.attachType = mscfg.doIK159NewPointToDef
+                            ? AIKCtrl.IKAttachType.NewPoint
+                            : AIKCtrl.IKAttachType.Point;
                 }
             }
 
@@ -11504,8 +11528,6 @@ namespace ExtensionMethods
                             continue;
 
                         AIKCtrl.IKTargetData tm = im.curTargetData;
-                        AIKCtrl.IKTargetData ts = isd.curTargetData;
-
                         if (string.IsNullOrEmpty(tm.tgtAttachName) && tm.target == null)
                             continue;
 
@@ -11513,12 +11535,17 @@ namespace ExtensionMethods
                         {
                             attachType = im.attachType,
                             execTiming = AIKCtrl.IKExecTiming.Normal,
+                            attachIKName = tm.attachIKName,
                             attachTarget = tm.target,
                             attachPointName = tm.tgtAttachName,
+                            axisBone = tm.axisTarget,
                             offset = tm.tgtOffset,
-                            doAnimation = false,
+                            offsetEnable = im.offsetEnable,
+                            posOffsetType = cm.posOffsetType,
+                            doAnimation = im.doAnimation,
                         };
                         cs.SetIKSetting(param);
+                        AIKCtrl.IKTargetData ts = isd.GetTgtData(AIKCtrl.IKExecTiming.Normal);
                         ts.tgtAttachSlot = tm.tgtAttachSlot;
 
                         if (isd.isPointAttach)
@@ -11548,15 +11575,15 @@ namespace ExtensionMethods
                 if (ctrl == null)
                     return;
 
-                Transform axis = null;
+                Transform target = null;
                 if (master != null && master.body0 && !string.IsNullOrEmpty(boneTgtname))
-                    axis = master.body0.GetBone(boneTgtname);
+                    target = master.body0.GetBone(boneTgtname);
 
                 var param = new kt.ik.IKAttachParam(slave, master)
                 {
                     attachType = AIKCtrl.IKAttachType.Rotate,
                     execTiming = AIKCtrl.IKExecTiming.Normal,
-                    axisBone = axis,
+                    attachTarget = target,
                     offset = v3HandLOffsetRot,
                     doAnimation = false,
                 };
@@ -11576,9 +11603,12 @@ namespace ExtensionMethods
                 if (ctrl == null)
                     return;
 
-                AIKCtrl.IKAttachType type = mscfg != null && mscfg.doIK159NewPointToDef
-                    ? AIKCtrl.IKAttachType.NewPoint
-                    : AIKCtrl.IKAttachType.Point;
+                AIKCtrl.IKSettingData data = GetSetting(ctrl, AIKCtrl.IKAttachType.NewPoint);
+                AIKCtrl.IKAttachType type = data.attachType;
+                if (mscfg != null)
+                    type = mscfg.doIK159NewPointToDef
+                        ? AIKCtrl.IKAttachType.NewPoint
+                        : AIKCtrl.IKAttachType.Point;
 
                 var param = new kt.ik.IKAttachParam(slave, master)
                 {
@@ -11593,9 +11623,7 @@ namespace ExtensionMethods
 
                 // IKAttachParam.slotNo は slotName から導出される読み取り専用プロパティなので、
                 // 数値で受け取った slot_no は設定後に直接書き込む
-                AIKCtrl.IKSettingData data = GetSetting(ctrl, type);
-                if (data != null && data.curTargetData != null)
-                    data.curTargetData.tgtAttachSlot = slot_no;
+                data.GetTgtData(AIKCtrl.IKExecTiming.Normal).tgtAttachSlot = slot_no;
             }
         }
 #endif
@@ -11620,7 +11648,7 @@ namespace ExtensionMethods
                 _handNew.fiOffset = typTgt.GetField("tgtOffset", BindingFlags.Instance | BindingFlags.Public);
                 return;
             }
-#endif
+#else
 
             if (IkXT.IsIkCtrlO132)
             {
@@ -11713,6 +11741,7 @@ namespace ExtensionMethods
                 _handNew.fiOffset = typL.GetField("TgtOffset",
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
             }
+#endif
         }
 
         public class SetIK
@@ -11722,8 +11751,6 @@ namespace ExtensionMethods
             object objR;
             FiHand fiR, fiL;
 
-            // 反射ハンドルが揃わない環境（COM3D2.5 3.x など）では全プロパティを無効化する。
-            // 3.x は IKCtrlData / IKMgrData / TBody.IkPointR を持たないため、ここが false になる。
             bool valid;
 
             public Transform tgtHandR
@@ -11913,7 +11940,9 @@ namespace ExtensionMethods
         public static void owIkParam(this TBody tb, bool boR, Vector3 vechand, Vector3 knee_old)
         {
             object ikm;
-            if (typeIKP != null)
+            if (IkXT.IsNewIK)
+                ikm = IkXT.GetIKCmo(tb, boR ? "右手" : "左手");
+            else if (typeIKP != null)
             {
                 var objL = boR ? fiIkpointR.GetValue(tb) : fiIkpointL.GetValue(tb);
                 //if (objL != null)
@@ -11933,6 +11962,9 @@ namespace ExtensionMethods
                         BindingFlags.DeclaredOnly, null, tb, null);
             }
 
+            if (ikm == null || fiVechand == null || fiKnee_old == null)
+                return;
+
             fiVechand.SetValue(ikm, vechand);
             fiKnee_old.SetValue(ikm, knee_old);
         }
@@ -11940,7 +11972,7 @@ namespace ExtensionMethods
 
         public static void setR_vechand(this TBody tb, Vector3 v3)
         {
-            if (IkXT.IsIkMgr159 || IkXT.IsIkCtrlO117)
+            if (IkXT.IsNewIK)
             {
                 //fiVechand.SetValue(tb.IKHandR.IKCmo, v3);
                 object cmoR = IkXT.GetIKCmo(tb, "右手");
@@ -11971,7 +12003,7 @@ namespace ExtensionMethods
 
         public static void setL_vechand(this TBody tb, Vector3 v3)
         {
-            if (IkXT.IsIkMgr159 || IkXT.IsIkCtrlO117)
+            if (IkXT.IsNewIK)
             {
                 //fiVechand.SetValue(tb.IKHandL.IKCmo, v3);
                 object cmoL = IkXT.GetIKCmo(tb, "左手");
