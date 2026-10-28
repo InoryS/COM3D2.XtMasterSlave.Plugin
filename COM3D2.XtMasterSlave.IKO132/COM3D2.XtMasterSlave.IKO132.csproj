@@ -38,9 +38,7 @@
     <Reference Include="UnityInjector">
       <HintPath>..\libs\UnityInjector.dll</HintPath>
     </Reference>
-    <Reference Include="COM3D2.XTMasterSlave.Plugin">
-      <HintPath>..\libs\COM3D2.XTMasterSlave.Plugin.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\COM3D2.XTMasterSlave.Plugin\COM3D2.XTMasterSlave.Plugin.csproj" Private="false" />
     <Reference Include="UnityEngine">
       <HintPath>..\libs\UnityEngine.dll</HintPath>
     </Reference>

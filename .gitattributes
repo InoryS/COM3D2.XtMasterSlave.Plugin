@@ -61,3 +61,17 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# 随包分发的配置与文档固定用 CRLF 检出 / Ship-time configs and docs always use CRLF
+#
+# 这些文件会原样打进发布包（.github/scripts/package.py 逐字节复制）。仓库里存的是 LF，
+# 但历史发布的 zip 里是 CRLF；不固定 eol 的话，Linux 上构建出的包会变成 LF，
+# 和以前的包不一致。eol=crlf 让所有平台的检出都是 CRLF，仓库内的存储不受影响。
+#
+# These files are copied byte for byte into the release archive. The repo stores LF, but every
+# released zip so far carried CRLF. Pinning eol keeps Linux builds byte-identical to the old
+# Windows-built packages; the blobs in the repository stay LF.
+###############################################################################
+Config/**           text eol=crlf
+"orginal readme/**" text eol=crlf

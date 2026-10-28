@@ -1,47 +1,53 @@
 name: Build
 
+# 每次 push / PR 都跑一遍「编译 + 打包」，发版流程（release.yml）用的是同一套脚本，
+# 所以这里挂掉就等于发版会挂掉，能提前发现
+# Every push and PR runs the same build and packaging the release workflow uses, so a failure
+# here is a failure there and shows up before the tag is pushed
 on:
   push:
     branches: [ "master", "main" ]
   pull_request:
     branches: [ "master", "main" ]
 
-
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup MSBuild.exe path
-        run: |
-          sudo apt-get install -y apt-transport-https
-          sudo apt-get update
-          sudo apt-get install -y mono-devel
-          sudo apt-get install -y msbuild
-          echo "msbuild: $(which msbuild)"
-
-      - uses: nuget/setup-nuget@v2
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
-          nuget-api-key: ${{ secrets.NuGetAPIKey }}
-          nuget-version: '5.x'
-      - run: nuget restore COM3D2.XTMasterSlave.Plugin.sln
+          persist-credentials: false
 
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.x'
+
+      # 两个工程都是 net35：插件本体 + IKO132 的 IK 模块（构建后由 csproj 的 RenameOutput 改成 .xdll）
+      # Both projects target net35: the plugin itself and the IKO132 IK module, which the csproj
+      # renames to .xdll after the build
       - name: Build
-        run: |
-          msbuild /p:Configuration=Release /p:TargetFrameworkVersion=v3.5
+        run: dotnet build COM3D2.XTMasterSlave.Plugin.sln -c Release
 
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v4
+      - name: Package Release Archive
+        run: |
+          VERSION="$(python3 .github/scripts/version.py)"
+          echo "plugin version: ${VERSION}"
+          python3 .github/scripts/package.py \
+            --version "${VERSION}" \
+            --plugin-dll COM3D2.XTMasterSlave.Plugin/bin/Release/net35/COM3D2.XTMasterSlave.Plugin.dll \
+            --ik-dll COM3D2.XtMasterSlave.IKO132/bin/Release/net35/COM3D2.XtMasterSlave.IKO132.xdll \
+            --output-dir dist
+          ls -l dist/
+
+      - name: Upload Archive
+        uses: actions/upload-artifact@v7
         with:
           name: COM3D2.XtMasterSlave.Plugin
-          path: /home/runner/work/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/COM3D2.XTMasterSlave.Plugin/bin/Release/net35/COM3D2.XTMasterSlave.Plugin.dll
-
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: COM3D2.XtMasterSlave.IKO132
-          path: /home/runner/work/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.Plugin/COM3D2.XtMasterSlave.IKO132/bin/Release/net35/COM3D2.XtMasterSlave.IKO132.xdll
-
-    
+          path: dist/*.zip
+          retention-days: 7
+          if-no-files-found: error
